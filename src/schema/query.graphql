@@ -1,0 +1,5 @@
+type Query {
+	getUser(id: String!): User
+	getAllGroups: [Group]
+	getAllEvents: [Event]
+}

@@ -1,0 +1,5 @@
+type Mutation {
+	createUser(user: InputUser!): User
+	createGroup(group: InputGroup!): Group
+	createEvent(event: InputEvent!): Event
+}

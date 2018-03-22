@@ -1,0 +1,11 @@
+{
+	"presets": ["latest"],
+	"plugins": [
+		["babel-plugin-inline-import", {
+			"extensions": [
+				".gql",
+				".graphql"
+			]
+		}]
+	]
+}
