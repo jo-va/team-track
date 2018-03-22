@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 
 mongoose.Promise = global.Promise;
 
 const currentDate = () => Date.now();
+const generateSecret = () => crypto.randomBytes(4).toString('hex');
 
 const UserSchema = new mongoose.Schema({
 	name: {
@@ -36,7 +38,7 @@ const GroupSchema = new mongoose.Schema({
 	},
 	secretToken: {
 		type: String,
-		default: 'SECRET'
+		default: generateSecret
 	}
 });
 

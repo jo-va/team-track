@@ -13,6 +13,7 @@ const findByName = (name) => {
 };
 
 const create = (event) => {
+	// name must be unique
 	return db.create(event);
 };
 

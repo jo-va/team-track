@@ -1,8 +1,5 @@
 type User {
 	_id: String,
 	name: String
-}
-
-input InputUser {
-	name: String!
+	group: Group
 }

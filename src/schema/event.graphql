@@ -1,8 +1,5 @@
 type Event {
 	_id: String
 	name: String
-}
-
-input InputEvent {
-	name: String!
+	groups: [Group]
 }

@@ -1,5 +1,10 @@
 type Query {
 	getUser(id: String!): User
-	getAllGroups: [Group]
+	getAllUsers(groupId: String): [User]
+
+	getGroup(id: String!): Group
+	getAllGroups(eventId: String): [Group]
+
+	getEvent(id: String!): Event
 	getAllEvents: [Event]
 }

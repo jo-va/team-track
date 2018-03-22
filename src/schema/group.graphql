@@ -2,10 +2,6 @@ type Group {
 	_id: String
 	name: String
 	event: Event
-}
-
-input InputGroup {
-	name: String!
-	eventId: String!
+	users: [User]
 	secretToken: String
 }

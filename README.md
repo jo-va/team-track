@@ -1,3 +1,6 @@
+To run locally:
+yarn db:up
+yarn dev
 
 See this for a great explanation of the project's structure:
 * https://github.com/CaveOfCodeBlog/simple-apollo-server
