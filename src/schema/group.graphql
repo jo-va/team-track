@@ -1,7 +1,7 @@
 type Group {
-	_id: String
-	name: String
-	event: Event
-	users: [User]
+	id: ID!
+	name: String!
+	event: Event!
+	participants: [Participant]
 	secretToken: String
 }

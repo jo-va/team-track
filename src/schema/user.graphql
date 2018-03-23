@@ -1,5 +1,5 @@
 type User {
-	_id: String,
-	name: String
-	group: Group
+	id: ID!,
+	name: String!
+	avatar: String
 }

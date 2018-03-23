@@ -1,10 +1,10 @@
-import { User, Group, Event } from '../models';
+import { Participant, Group, Event } from '../models';
 // import socket from '../socket';
 
 export const Mutation = {
-	createUser: (_, user) => {
+	createParticipant: (_, { userId, secretToken }) => {
 		// socket.publish('EVENT_CREATED', { userAdded: user });
-		return User.create(user);
+		return Participant.create(userId, secretToken);
 	},
 	createGroup: (_, group) => {
 		return Group.create(group);

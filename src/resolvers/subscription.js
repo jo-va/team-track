@@ -1,7 +1,7 @@
 import socket from '../socket';
 
 export const Subscription = {
-	userAdded: {
+	participantAdded: {
 		subscribe: () => socket.asyncIterator('EVENT_CREATED')
 	}
 };

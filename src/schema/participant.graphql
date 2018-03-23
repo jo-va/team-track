@@ -1,0 +1,6 @@
+type Participant {
+	id: ID!
+	name: String!
+	user: User!
+	group: Group
+}

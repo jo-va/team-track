@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import { Group as db } from '../connectors';
+import { Event } from './event';
 
 const findAllByEventId = (eventId) => {
 	if (eventId) {
@@ -20,10 +21,13 @@ const findBySecretToken = (secretToken) => {
 	return db.findOne({ secretToken });
 };
 
-const create = (group) => {
-	// group.name must be unique
+const create = async (group) => {
 	// group.eventId must be valid
-	return db.create(group);
+	const event = await Event.findById(group.eventId);
+	if (event) {
+		return db.create(group);
+	}
+	return null;
 };
 
 export const Group = {

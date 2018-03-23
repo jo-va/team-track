@@ -1,10 +1,10 @@
 type Query {
-	getUser(id: String!): User
-	getAllUsers(groupId: String): [User]
+	participant(id: ID!): Participant
+	participants(groupId: ID): [Participant]
 
-	getGroup(id: String!): Group
-	getAllGroups(eventId: String): [Group]
+	group(id: ID!): Group
+	groups(eventId: ID): [Group]
 
-	getEvent(id: String!): Event
-	getAllEvents: [Event]
+	event(id: ID!): Event
+	events: [Event]
 }

@@ -1,5 +1,5 @@
 type Mutation {
-	createUser(name: String!, secretToken: String!): User
-	createGroup(name: String!, eventId: String!, secretToken: String): Group
+	createParticipant(userId: ID!, secretToken: String!): Participant
+	createGroup(name: String!, eventId: ID!, secretToken: String): Group
 	createEvent(name: String!): Event
 }

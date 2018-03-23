@@ -1,5 +1,5 @@
-type Event {
-	_id: String
-	name: String
+type Event  {
+	id: ID!
+	name: String!
 	groups: [Group]
 }
