@@ -1,33 +1,55 @@
 import { Types } from 'mongoose';
-import { Group as db } from '../connectors';
-import { Event } from './event';
+import * as db from '../connectors';
 
-const findAllByEventId = (eventId) => {
-	if (eventId) {
-		return Types.ObjectId.isValid(eventId) ? db.find({ eventId }) : [];
+const findAllByEventId = (event) => {
+	if (event) {
+		return Types.ObjectId.isValid(event) ? db.Group.find({ event }) : [];
 	}
-	return db.find({});
+	return db.Group.find({});
 };
 
 const findById = (id) => {
-	return db.findById(id);
+	return db.Group.findById(id);
 };
 
 const findByName = (name) => {
-	return db.findOne({ name });
+	return db.Group.findOne({ name });
 };
 
 const findBySecretToken = (secretToken) => {
-	return db.findOne({ secretToken });
+	return db.Group.findOne({ secretToken });
 };
 
 const create = async (group) => {
-	// group.eventId must be valid
-	const event = await Event.findById(group.eventId);
-	if (event) {
-		return db.create(group);
+	// name must be specified
+	if (!group.name || !group.name.trim()) {
+		throw new Error('Group name cannot be blank');
 	}
-	return null;
+
+	// An event must exist for this group
+	if (!Types.ObjectId.isValid(group.event)) {
+		throw new Error('Invalid Event ID');
+	}
+	const event = await db.Event.findById(group.event);
+	if (!event) {
+		throw new Error(`Found no event with id ${group.event}`);
+	}
+
+	// The name must be unique
+	let duplicate = await findByName(group.name);
+	if (duplicate) {
+		throw new Error('A group already exists with this name');
+	}
+
+	// The secret must be unique
+	if (group.secretToken && group.secretToken.trim()) {
+		duplicate = await findBySecretToken(group.secretToken);
+		if (duplicate) {
+			throw new Error('This secret is already used');
+		}
+	}
+
+	return db.Group.create(group);
 };
 
 export const Group = {

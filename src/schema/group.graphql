@@ -3,5 +3,6 @@ type Group {
 	name: String!
 	event: Event!
 	participants: [Participant]
+	distance: Float
 	secretToken: String
 }

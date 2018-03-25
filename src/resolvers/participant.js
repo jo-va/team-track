@@ -1,14 +1,14 @@
 import { User, Group } from '../models';
 
 export const Participant = {
-	name: async ({ userId }) => {
-		const user = await User.findById(userId);
-		return user.name;
+	username: async (participant) => {
+		const user = await User.findById(participant.user);
+		return user.username;
 	},
-	user: ({ userId }) => {
-		return User.findById(userId);
+	user: (participant) => {
+		return User.findById(participant.user);
 	},
-	group: ({ groupId }) => {
-		return Group.findById(groupId);
+	group: (participant) => {
+		return Group.findById(participant.group);
 	}
 };

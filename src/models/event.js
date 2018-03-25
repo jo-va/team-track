@@ -13,6 +13,9 @@ const findByName = (name) => {
 };
 
 const create = (event) => {
+	if (!event.name || !event.name.trim()) {
+		throw new Error('Event name cannot be blank');
+	}
 	return db.create(event);
 };
 

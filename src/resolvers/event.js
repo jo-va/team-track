@@ -1,7 +1,7 @@
 import { Group } from '../models';
 
 export const Event = {
-	groups: ({ id }) => {
-		return Group.findAllByEventId(id);
+	groups: (event) => {
+		return Group.findAllByEventId(event.id);
 	}
 };

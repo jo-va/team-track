@@ -2,4 +2,9 @@ type Event  {
 	id: ID!
 	name: String!
 	groups: [Group]
+	latitude: Float
+	longitude: Float
+	radius: Float
+	distance: Float
+	state: String
 }

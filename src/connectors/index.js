@@ -7,46 +7,60 @@ mongoose.Promise = global.Promise;
 const generateSecret = () => crypto.randomBytes(4).toString('hex');
 
 const UserSchema = new mongoose.Schema({
-	name: {
+	username: {
 		type: String,
 		required: true,
 		unique: true,
 		trim: true
 	},
+	email: {
+		type: String,
+		required: true,
+		unique: true,
+		trim: true
+	},
+	password: {
+		type: String,
+		default: null
+	},
 	avatar: {
 		type: String,
+		default: null
 	},
-	roles: {
-		type: [String]
+	isAdmin: {
+		type: Boolean,
+		default: false
 	}
 });
 
 const ParticipantSchema = new mongoose.Schema({
-	userId: {
+	user: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User',
 		required: true
 	},
-	groupId: {
+	group: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Group'
+		ref: 'Group',
+		required: true
 	},
 	distance: {
 		type: Number,
 		default: 0,
 		min: 0
 	},
-	timestamp: {
+	latitude: {
 		type: Number,
-		default: Date.now
+		default: null
 	},
 	longitude: {
 		type: Number,
-		required: true
+		default: null
 	},
-	latitude: {
-		type: Number,
-		required: true
+	state: {
+		type: String,
+		default: 'inactive',
+		enum: ['active', 'inactive']
 	}
 });
 
@@ -57,7 +71,7 @@ const GroupSchema = new mongoose.Schema({
 		unique: true,
 		trim: true
 	},
-	eventId: {
+	event: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Event',
 		required: true
@@ -78,20 +92,32 @@ const EventSchema = new mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
-		unique: [true, 'Name must be unique'],
+		unique: true,
 		trim: true
 	},
 	date: {
 		type: Date,
 		default: Date.now
 	},
+	latitude: {
+		type: Number
+	},
+	longitude: {
+		type: Number
+	},
+	radius: {
+		type: Number,
+		default: 500,
+		min: 0
+	},
 	distance: {
 		type: Number,
 		default: 0,
 		min: 0
 	},
-	active: {
+	state: {
 		type: String,
+		default: 'inactive',
 		enum: ['active', 'inactive']
 	}
 });
@@ -102,7 +128,7 @@ GroupSchema.plugin(uniqueValidator);
 EventSchema.plugin(uniqueValidator);
 
 export const User = mongoose.model('User', UserSchema);
-export const Participant = mongoose.model('Geodata', ParticipantSchema);
+export const Participant = mongoose.model('Participant', ParticipantSchema);
 export const Group = mongoose.model('Group', GroupSchema);
 export const Event = mongoose.model('Event', EventSchema);
 

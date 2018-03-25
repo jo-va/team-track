@@ -1,10 +1,10 @@
 import { Participant, Event } from '../models';
 
 export const Group = {
-	event: ({ eventId }) => {
-		return Event.findById(eventId);
+	event: (group) => {
+		return Event.findById(group.event);
 	},
-	participants: ({ id }) => {
-		return Participant.findAllByGroupId(id);
+	participants: (group) => {
+		return Participant.findAllByGroupId(group.id);
 	}
 };

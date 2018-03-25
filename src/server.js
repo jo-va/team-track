@@ -6,35 +6,56 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { subscribe, execute } from 'graphql';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 
 import schema from './schema';
 import resolvers from './resolvers';
-
-const PORT = process.env.PORT || 5000;
-
-const app = express();
-
-app.use(cors());
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 const executableSchema = makeExecutableSchema({
 	typeDefs: schema,
 	resolvers
 });
 
-app.use('/graphql', graphqlExpress(() => {
-	return {
-		schema: executableSchema,
-		context: { }
-	};
-}));
+const PORT = process.env.PORT || 5000;
+const SECRET = 'asldkjfa98faf982301*@&!asdfliw';
+
+const app = express();
+
+const addUser = async (req) => {
+	const token = req.headers.authorization;
+	try {
+		if (token) {
+			const { user } = await jwt.verify(token, SECRET);
+			req.user = user;
+		}
+	} catch (err) {
+		console.log(err);
+	}
+	req.next();
+};
+
+app.use(cors('*'));
+app.use(addUser);
 
 app.use('/graphiql', graphiqlExpress({
 	endpointURL: '/graphql',
 	subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`
 }));
+
+app.use(
+	'/graphql',
+	bodyParser.json(),
+	graphqlExpress((req) => {
+		return {
+			schema: executableSchema,
+			context: {
+				user: req.user,
+				SECRET
+			},
+			debug: true
+		};
+	})
+);
 
 const server = createServer(app);
 
