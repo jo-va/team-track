@@ -7,6 +7,7 @@ import { subscribe, execute } from 'graphql';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import morgan from 'morgan';
 
 import schema from './schema';
 import resolvers from './resolvers';
@@ -34,6 +35,7 @@ const addUser = async (req) => {
 	req.next();
 };
 
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
 app.use(cors('*'));
 app.use(addUser);
 

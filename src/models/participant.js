@@ -36,8 +36,7 @@ const create = async (userId, secretToken) => {
 	// If a participant already exists, update its group.
 	const other = await findByUserId(userId);
 	if (other) {
-		other.set({ group: group._id });
-		return other.save();
+		return other.set({ group: group._id }).save();
 	}
 
 	return db.Participant.create({
