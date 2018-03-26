@@ -6,12 +6,12 @@
 	"scripts": {
 		"dev": "nodemon src/server.js",
 		"build": "babel src -d build",
-		"start": "node build/server.js",		
+		"start": "node build/server.js",
 		"deploy:dev": "docker-compose up --build",
 		"deploy:prod": "yarn build && ./deploy.sh"
 	},
 	"dependencies": {
-		"bcrypt": "^1.0.3",
+		"bcryptjs": "^2.4.3",
 		"body-parser": "^1.18.2",
 		"cors": "^2.8.4",
 		"dotenv": "^5.0.1",

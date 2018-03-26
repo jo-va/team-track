@@ -10,3 +10,4 @@ See this for a great explanation of the project's structure:
 Docker image with yarn:
 https://hackernoon.com/using-yarn-with-docker-c116ad289d56
 https://medium.com/@shemleong/using-docker-and-yarn-for-development-2546e567ad2
+https://github.com/kriasoft/nodejs-api-starter

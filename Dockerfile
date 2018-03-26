@@ -1,4 +1,4 @@
-FROM node:8.9.3-alpine
+FROM node:9.9.0-alpine
 
 ARG NODE_ENV=production
 ENV NODE_ENV=$NODE_ENV
@@ -18,5 +18,7 @@ RUN cd /usr/src/app && ln -s /tmp/node_modules
 
 # Attempts to copy "build" folder even if it doesn't exist
 COPY .env build* ./build/
+
+USER node
 
 CMD [ "node", "build/server.js" ]
