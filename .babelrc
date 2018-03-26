@@ -1,11 +1,23 @@
 {
-	"presets": ["latest"],
+	"presets": [
+		[
+			"env",
+			{
+				"targets": {
+					"node": "current"
+				}
+			}
+		]
+	],
 	"plugins": [
-		["babel-plugin-inline-import", {
-			"extensions": [
-				".gql",
-				".graphql"
-			]
-		}]
+		[
+			"babel-plugin-inline-import",
+			{
+				"extensions": [
+					".gql",
+					".graphql"
+				]
+			}
+		]
 	]
 }

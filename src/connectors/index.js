@@ -132,7 +132,7 @@ export const Participant = mongoose.model('Participant', ParticipantSchema);
 export const Group = mongoose.model('Group', GroupSchema);
 export const Event = mongoose.model('Event', EventSchema);
 
-export const MongooseConnection = mongoose.connect(process.env.MONGODB_URI)
+export const MongooseConnection = mongoose.connect(process.env.DATABASE_URL)
 	.catch((connectError) => {
 		console.error('Could not connect to MongoDB', connectError);
 	});

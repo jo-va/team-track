@@ -36,7 +36,7 @@ export const Mutation = {
 		return User.create(user);
 	},
 
-	login: async (root, { email, password }, { SECRET }) => {
+	login: async (root, { email, password }, { secret }) => {
 		const user = await User.findByEmail(email);
 		if (!user) {
 			throw new Error('No user with that email');
@@ -49,7 +49,7 @@ export const Mutation = {
 
 		const token = jwt.sign(
 			{ user: _.pick(user, ['id', 'username']) },
-			SECRET,
+			secret,
 			{ expiresIn: '1y' }
 		);
 		return token;

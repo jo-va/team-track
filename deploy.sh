@@ -1,0 +1,1 @@
+docker build -t jova/relay-api . && docker push jova/relay-api

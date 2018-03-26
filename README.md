@@ -6,3 +6,7 @@ See this for a great explanation of the project's structure:
 * https://github.com/CaveOfCodeBlog/simple-apollo-server
 * https://caveofcode.com/2016/10/apollo-server-using-the-graphql-schema-language/
 * https://caveofcode.com/2016/11/the-connector-and-model-layer-in-your-graphql-apollo-server/
+
+Docker image with yarn:
+https://hackernoon.com/using-yarn-with-docker-c116ad289d56
+https://medium.com/@shemleong/using-docker-and-yarn-for-development-2546e567ad2

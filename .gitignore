@@ -1,3 +1,7 @@
 node_modules/
 mongodbdata/
+build/
+.env
 yarn-error.json
+.yarn_cache/*
+!.yarn_cache/.gitkeep

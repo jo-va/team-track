@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
@@ -17,16 +18,13 @@ const executableSchema = makeExecutableSchema({
 	resolvers
 });
 
-const PORT = process.env.PORT || 5000;
-const SECRET = 'asldkjfa98faf982301*@&!asdfliw';
-
 const app = express();
 
 const addUser = async (req) => {
 	const token = req.headers.authorization;
 	try {
 		if (token) {
-			const { user } = await jwt.verify(token, SECRET);
+			const { user } = await jwt.verify(token, process.env.JWT_SECRET);
 			req.user = user;
 		}
 	} catch (err) {
@@ -41,7 +39,7 @@ app.use(addUser);
 
 app.use('/graphiql', graphiqlExpress({
 	endpointURL: '/graphql',
-	subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`
+	subscriptionsEndpoint: `ws://localhost:${process.env.PORT}/subscriptions`
 }));
 
 app.use(
@@ -52,7 +50,7 @@ app.use(
 			schema: executableSchema,
 			context: {
 				user: req.user,
-				SECRET
+				secret: process.env.JWT_SECRET
 			},
 			debug: true
 		};
@@ -61,7 +59,7 @@ app.use(
 
 const server = createServer(app);
 
-server.listen(PORT, (err) => {
+server.listen(process.env.PORT, (err) => {
 	if (err) {
 		throw err;
 	}
@@ -76,5 +74,5 @@ server.listen(PORT, (err) => {
 		path: '/subscriptions'
 	});
 
-	console.log(`> Server ready on http://localhost:${PORT}/graphql`);
+	console.log(`> Server ready on http://localhost:${process.env.PORT}/graphql`);
 });
