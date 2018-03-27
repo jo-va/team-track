@@ -12,6 +12,7 @@ import morgan from 'morgan';
 
 import schema from './schema';
 import resolvers from './resolvers';
+import { User } from './models';
 
 const executableSchema = makeExecutableSchema({
 	typeDefs: schema,
@@ -21,11 +22,17 @@ const executableSchema = makeExecutableSchema({
 const app = express();
 
 const addUser = async (req) => {
-	const token = req.headers.authorization;
+	req.user = null;
 	try {
-		if (token) {
-			const { user } = await jwt.verify(token, process.env.JWT_SECRET);
-			req.user = user;
+		const bearerLength = 'Bearer '.length;
+		const { authorization } = req.headers;
+		if (authorization && authorization.length > bearerLength) {
+			const token = authorization.slice(bearerLength);
+			if (token) {
+				const { id } = await jwt.verify(token, process.env.JWT_SECRET);
+				const existingUser = await User.findById(id);
+				req.user = existingUser;
+			}
 		}
 	} catch (err) {
 		console.log(err);

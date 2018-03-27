@@ -1,4 +1,4 @@
-import { User, Participant, Group, Event } from '../models';
+import { Participant, Group, Event } from '../models';
 
 export const Query = {
 	participant: (root, { id }) => {
@@ -20,10 +20,7 @@ export const Query = {
 		return Event.findAll();
 	},
 	currentUser: (root, args, { user }) => {
-		if (user) {
-			return User.findById(user.id);
-		}
-		return null;
+		return user;
 	},
 	currentParticipant: (root, args, { user }) => {
 		if (user) {

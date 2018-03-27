@@ -12,6 +12,10 @@ const findByEmail = (email) => {
 	return db.findOne({ email });
 };
 
+const findByEmailOrUsername = (value) => {
+	return db.findOne({ $or: [{ email: value }, { username: value }] });
+};
+
 const create = async (user) => {
 	// The username must be specified
 	if (!user.username || !user.username.trim()) {
@@ -44,5 +48,6 @@ export const User = {
 	findAll,
 	findById,
 	findByEmail,
+	findByEmailOrUsername,
 	create
 };

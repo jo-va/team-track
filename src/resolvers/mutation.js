@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, Participant, Group, Event } from '../models';
@@ -6,12 +5,11 @@ import { User, Participant, Group, Event } from '../models';
 
 const checkAuth = (user) => {
 	if (!user) {
-		throw new Error('You must login');
+		throw new Error('You are not authenticated');
 	}
 };
 
-const checkAdmin = async (userId) => {
-	const user = await User.findById(userId);
+const checkAdmin = (user) => {
 	if (!user || !user.isAdmin) {
 		throw new Error('You are not authorized');
 	}
@@ -20,35 +18,33 @@ const checkAdmin = async (userId) => {
 export const Mutation = {
 	createGroup: async (root, group, { user }) => {
 		checkAuth(user);
-		await checkAdmin(user.id);
+		checkAdmin(user);
 		return Group.create(group);
 	},
 
 	createEvent: async (root, event, { user }) => {
 		checkAuth(user);
-		await checkAdmin(user.id);
+		checkAdmin(user);
 		return Event.create(event);
 	},
 
 	register: async (root, { username, email, password }) => {
-		const user = { username, email, password };
-		user.password = await bcrypt.hash(user.password, 12);
-		return User.create(user);
+		const hash = await bcrypt.hash(password, 12);
+		return User.create({ username, email, password: hash });
 	},
 
-	login: async (root, { email, password }, { secret }) => {
-		const user = await User.findByEmail(email);
+	login: async (root, { emailOrUsername, password }, { secret }) => {
+		const user = await User.findByEmailOrUsername(emailOrUsername);
 		if (!user) {
-			throw new Error('No user with that email');
+			throw new Error('User not found');
 		}
-
 		const valid = await bcrypt.compare(password, user.password);
 		if (!valid) {
 			throw new Error('Incorrect password');
 		}
 
 		const token = jwt.sign(
-			{ user: _.pick(user, ['id', 'username']) },
+			{ id: user.id },
 			secret,
 			{ expiresIn: '1y' }
 		);
