@@ -1,1 +1,2 @@
-docker build -t jova/relay-api . && docker push jova/relay-api
+docker build -t relay-for-life-api .
+#docker push jova/relay-api

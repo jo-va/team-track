@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  labels:
+    name: api
+  name: api-controller
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: api
+    spec:
+      containers:
+      - image: gcr.io/relay-for-life-api/api
+        name: api
+        ports:
+        - containerPort: 3000
+          name: graphql

@@ -17,8 +17,10 @@ RUN set -ex; \
 RUN cd /usr/src/app && ln -s /tmp/node_modules
 
 # Attempts to copy "build" folder even if it doesn't exist
-COPY .env build* ./build/
+COPY .env ./build* ./
+
+RUN ls -al
 
 USER node
 
-CMD [ "node", "build/server.js" ]
+CMD [ "node", "server.js" ]
