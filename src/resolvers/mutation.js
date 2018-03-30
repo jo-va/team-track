@@ -28,9 +28,16 @@ export const Mutation = {
 		return Event.create(event);
 	},
 
-	register: async (root, { username, email, password }) => {
+	register: async (root, { username, email, password }, { secret }) => {
 		const hash = await bcrypt.hash(password, 12);
-		return User.create({ username, email, password: hash });
+		const user = await User.create({ username, email, password: hash });
+
+		const token = jwt.sign(
+			{ id: user.id },
+			secret,
+			{ expiresIn: '1w' }
+		);
+		return token;
 	},
 
 	login: async (root, { emailOrUsername, password }, { secret }) => {
@@ -46,7 +53,7 @@ export const Mutation = {
 		const token = jwt.sign(
 			{ id: user.id },
 			secret,
-			{ expiresIn: '1y' }
+			{ expiresIn: '1w' }
 		);
 		return token;
 	},
