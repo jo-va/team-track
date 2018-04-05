@@ -25,7 +25,7 @@ services:
                         - yarn:/home/node/.cache/yarn
                         - ./.babelrc:/usr/src/app/.babelrc
                         - ./.env:/usr/src/app/.env
-                        - ./src:/usr/src/app/src
+                        - ./server:/usr/src/app/server
                         - ./build:/usr/src/app/build
                         - ./package.json:/usr/src/app/package.json
                         - ./yarn.lock:/usr/src/app/yarn.lock

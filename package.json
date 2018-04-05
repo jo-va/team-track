@@ -4,8 +4,8 @@
 	"main": "index.js",
 	"license": "MIT",
 	"scripts": {
-		"dev": "nodemon src/server.js",
-		"build": "babel src -d build",
+		"dev": "nodemon server/server.js",
+		"build": "babel server -d build",
 		"start": "node build/server.js",
 		"deploy:dev": "docker-compose up --build",
 		"deploy:prod": "yarn build && ./deploy.sh"
@@ -49,7 +49,7 @@
 			"js": "babel-node"
 		},
 		"ext": ".js,.json,.graphql,.gql",
-		"watch": "./src"
+		"watch": "./server"
 	},
 	"eslintConfig": {
 		"extends": "airbnb-base",
@@ -58,10 +58,9 @@
 		],
 		"rules": {
 			"indent": [
-				2,
-				"tab"
+				4,
+				"space"
 			],
-			"no-tabs": "off",
 			"comma-dangle": "off",
 			"no-console": "off",
 			"function-paren-newline": "off",

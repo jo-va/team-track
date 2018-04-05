@@ -1,5 +1,4 @@
 node_modules/
-mongodbdata/
 build/
 .env
 yarn-error.json
