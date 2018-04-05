@@ -1,13 +1,13 @@
 type Query {
-	participant(id: ID!): Participant
-	participants(group: ID): [Participant]
+    #participant(id: ID!): Participant
+    participants(group: ID): [Participant]
 
-	group(id: ID!): Group
-	groups(event: ID): [Group]
+    group(id: ID!): Group
+    groups(event: ID): [Group]
 
-	event(id: ID!): Event
-	events: [Event]
+    event(id: ID!): Event
+    events: [Event]
 
-	currentUser: User
-	currentParticipant: Participant
+    user: User
+    participant: Participant
 }

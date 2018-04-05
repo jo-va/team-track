@@ -1,19 +1,19 @@
 type Mutation {
-	# Create a new group (admin only)
-	createGroup(name: String!, event: ID!, secretToken: String): Group
-	# Create a new event (admin only)
-	createEvent(name: String!, latitude: Float, longitude: Float, radius: Float): Event
-	# Start the event
-	#startEvent(id: ID!): Event
-	# Stop the event
-	#stopEvent(id: ID!): Event
+    # Create a new group (admin only)
+    createGroup(name: String!, event: ID!, secretToken: String): Group
+    # Create a new event (admin only)
+    createEvent(name: String!, latitude: Float, longitude: Float, radius: Float): Event
+    # Start the event
+    #startEvent(id: ID!): Event
+    # Stop the event
+    #stopEvent(id: ID!): Event
 
-	# Register a new user and log the user in, returns a JWT
-	register(username: String!, email: String!, password: String!): String
-	# login, must be registered first, returns a JWT
-	login(emailOrUsername: String!, password: String!): String
-	# Participate to the event, must be logged in, must provide the secret to be associated to a group
-	participate(secretToken: String!): Participant
-	# Update the position of the logged in participant
-	updatePosition(latitude: Float, longitude: Float): Participant
+    # Register a new user and log the user in, returns a JWT
+    register(username: String!, email: String!, password: String!): String
+    # login, must be registered first, returns a JWT
+    login(emailOrUsername: String!, password: String!): String
+    # Participate to the event, must be logged in, must provide the secret to be associated to a group
+    participate(secretToken: String!): Participant
+    # Update the position of the logged in participant
+    updatePosition(latitude: Float, longitude: Float): Participant
 }

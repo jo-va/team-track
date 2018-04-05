@@ -10,12 +10,12 @@ import Group from './group.graphql';
 import Event from './event.graphql';
 
 export default [
-	SchemaDefinition,
-	Query,
-	Mutation,
-	Subscription,
-	User,
-	Participant,
-	Group,
-	Event
+    SchemaDefinition,
+    Query,
+    Mutation,
+    Subscription,
+    User,
+    Participant,
+    Group,
+    Event
 ];

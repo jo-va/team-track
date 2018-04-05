@@ -1,10 +1,10 @@
 type Participant {
-	id: ID!
-	username: String!
-	user: User!
-	group: Group
-	distance: Float	
-	latitude: Float
-	longitude: Float
-	state: String
+    id: ID!
+    username: String!
+    user: User!
+    group: Group
+    distance: Float	
+    latitude: Float
+    longitude: Float
+    state: String
 }

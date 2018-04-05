@@ -1,6 +1,6 @@
 type User {
-	id: ID!,
-	username: String!
-	email: String!
-	avatar: String
+    id: ID!,
+    username: String!
+    email: String!
+    avatar: String
 }

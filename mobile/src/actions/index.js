@@ -1,1 +1,1 @@
-export * from './AuthActions.js';
+export * from './auth.actions.js';

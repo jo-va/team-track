@@ -7,13 +7,13 @@ import { Group } from './group';
 import { Event } from './event';
 
 const resolvers = {
-	Query,
-	Mutation,
-	Subscription,
-	User,
-	Participant,
-	Group,
-	Event
+    Query,
+    Mutation,
+    Subscription,
+    User,
+    Participant,
+    Group,
+    Event
 };
 
 export default resolvers;

@@ -1,37 +1,37 @@
 version: '3'
 services:
-        mongo-db:
-                image: mongo:latest
-                ports:
-                        - 27017:27017
-                volumes:
-                        - db-data:/data/db
-                command: mongod --smallfiles --logpath=/dev/null
+    mongo-db:
+        image: mongo:latest
+        ports:
+            - 27017:27017
+        volumes:
+            - db-data:/data/db
+        command: mongod --smallfiles --logpath=/dev/null
 
-        api:
-                image: api
-                build:
-                        context: .
-                        dockerfile: Dockerfile
-                        args:
-                                NODE_ENV: development
-                links:
-                        - mongo-db
-                depends_on:
-                        - mongo-db
-                ports:
-                        - 3000:3000
-                volumes:
-                        - yarn:/home/node/.cache/yarn
-                        - ./.babelrc:/usr/src/app/.babelrc
-                        - ./.env:/usr/src/app/.env
-                        - ./server:/usr/src/app/server
-                        - ./build:/usr/src/app/build
-                        - ./package.json:/usr/src/app/package.json
-                        - ./yarn.lock:/usr/src/app/yarn.lock
-                entrypoint: ["sh", "-c"]
-                command: ["yarn dev"]
+    api:
+        image: api
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                NODE_ENV: development
+        links:
+            - mongo-db
+        depends_on:
+            - mongo-db
+        ports:
+            - 3000:3000
+        volumes:
+            - yarn:/home/node/.cache/yarn
+            - ./.babelrc:/usr/src/app/.babelrc
+            - ./.env:/usr/src/app/.env
+            - ./server:/usr/src/app/server
+            - ./build:/usr/src/app/build
+            - ./package.json:/usr/src/app/package.json
+            - ./yarn.lock:/usr/src/app/yarn.lock
+        entrypoint: ["sh", "-c"]
+        command: ["yarn dev"]
 
 volumes:
-        db-data:
-        yarn:
+    db-data:
+    yarn:

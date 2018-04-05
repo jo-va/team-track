@@ -1,8 +1,8 @@
 type Group {
-	id: ID!
-	name: String!
-	event: Event!
-	participants: [Participant]
-	distance: Float
-	secretToken: String
+    id: ID!
+    name: String!
+    event: Event!
+    participants: [Participant]
+    distance: Float
+    secretToken: String
 }

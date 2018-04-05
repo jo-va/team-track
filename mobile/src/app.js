@@ -11,7 +11,7 @@ import { storage } from './common';
 //import { Provider } from 'react-redux';
 //import ReduxThunk from 'redux-thunk';
 //import reducers from './reducers';
-import Router from './Router';
+import Router from './router';
 
 // Redux:
 // https://medium.com/netscape/how-to-integrate-graphql-with-redux-in-react-native-c1912bf33120
@@ -22,51 +22,52 @@ import Router from './Router';
 // https://code.tutsplus.com/tutorials/common-react-native-app-layouts-login-page--cms-27639
 
 const httpLink = new HttpLink({
-	uri: 'http://192.168.0.174:3000/graphql'
+    uri: 'http://192.168.0.174:3000/graphql'
 });
 
 const authLink = setContext(async (req, { headers }) => {
-	const token = await storage.get('auth_token');
-	const authorization =  token ? `Bearer ${token}` : null;
+    const token = await storage.get('auth_token');
+    console.log(token);
+    const authorization =  token ? `Bearer ${token}` : null;
 
-	return {
-		headers: {
-			...headers,
-			authorization
-		}
-	};
+    return {
+        headers: {
+            ...headers,
+            authorization
+        }
+    };
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-	if (graphQLErrors) {
-		graphQLErrors.map(({ message, locations, path}) => {
-			console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
-		});
-	}
-	if (networkError) {
-		console.log(`[Network error]: ${networkError}`);
-	}
+    if (graphQLErrors) {
+        graphQLErrors.map(({ message, locations, path}) => {
+            console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
+        });
+    }
+    if (networkError) {
+        console.log(`[Network error]: ${networkError}`);
+    }
 });
 
 const client = new ApolloClient({
-	link: ApolloLink.from([
-		errorLink,
-		authLink,
-		httpLink
-	]),
-	cache: new InMemoryCache()
+    link: ApolloLink.from([
+        errorLink,
+        authLink,
+        httpLink
+    ]),
+    cache: new InMemoryCache()
 });
 
 class App extends React.Component {
-	render() {
-		//const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
+    render() {
+        //const store = createStore(reducers, {}, applyMiddleware(ReduxThunk));
 
-		return (
-			<ApolloProvider client={client}>
-				<Router />
-			</ApolloProvider>
-		);
-	}
+        return (
+            <ApolloProvider client={client}>
+                <Router />
+            </ApolloProvider>
+        );
+    }
 }
 
 export default App;
