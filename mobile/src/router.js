@@ -1,6 +1,6 @@
 import React from 'react';
 import { StackNavigator, TabNavigator, SwitchNavigator } from 'react-navigation';
-import { FontAwesome } from 'react-native-vector-icons';
+import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import SignUp from './screens/SignUp';
 import SignIn from './screens/SignIn';
 import Home from './screens/Home';
@@ -28,7 +28,7 @@ export const SignedIn = TabNavigator({
         navigationOptions: {
             tabBarLabel: 'Home',
             tabBarIcon: ({ tintColor }) => (
-                <FontAwesome name='home' size={30} color={tintColor} />
+                <Icon name='home' color={tintColor} size={30} />
             )
         }
     },
@@ -37,7 +37,7 @@ export const SignedIn = TabNavigator({
         navigationOptions: {
             tabBarLabel: 'Profile',
             tabBarIcon: ({ tintColor }) => (
-                <FontAwesome name='user' size={30} color={tintColor} />
+                <Icon name='user' color={tintColor} size={30} />
             )
         }
     }

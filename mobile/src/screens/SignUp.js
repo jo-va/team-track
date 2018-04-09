@@ -266,8 +266,11 @@ class SignUp extends React.Component {
                         clear
                         activeOpacity={0.5}
                         titleStyle={styles.signInButtonText}
+                        buttonStyle={{marginLeft: 10}}
                         onPress={this.signIn}
-                    />
+                        icon={<Icon name='login' color='orange' size={15} />}
+                        iconRight
+                    />                    
                 </View>
             </KeyboardAwareScrollView>
         );

@@ -10,6 +10,7 @@ const FormInput = props => {
         <Input
             ref={refInput}
             leftIcon={<Icon name={icon} color='white' size={18} />}
+            selectionColor='white'
             autoFocus={false}
             autoCorrect={false}
             blurOnSubmit={true}

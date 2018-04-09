@@ -3,7 +3,7 @@ import validatejs from 'validate.js';
 import { View, Text, StyleSheet, UIManager } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Button } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/SimpleLineIcons'
+import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import { Spinner, FormInput, Hr } from '../components';
 import { onSignIn } from '../auth';
 
@@ -122,7 +122,7 @@ class SignIn extends React.Component {
                     <Icon name='location-pin' color='orange' size={30} />
                 </View>
                 <Hr
-                    text='Register'
+                    text='Login'
                     textStyle={{color: 'white', fontSize: 20}}
                     lineStyle={{backgroundColor: 'white', height: StyleSheet.hairlineWidth }}
                 />              

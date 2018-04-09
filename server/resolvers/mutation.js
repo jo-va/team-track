@@ -33,7 +33,11 @@ export const Mutation = {
         const user = await User.create({ username, email, password: hash });
 
         const token = jwt.sign(
-            { id: user.id },
+            {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            },
             secret,
             { expiresIn: '1w' }
         );
@@ -51,7 +55,11 @@ export const Mutation = {
         }
 
         const token = jwt.sign(
-            { id: user.id },
+            {
+                id: user.id,
+                username: user.username,
+                email: user.email
+            },
             secret,
             { expiresIn: '1w' }
         );

@@ -1,3 +1,4 @@
+//import jwt from 'jsonwebtoken';
 import { storage } from './common';
 import apolloClient from './graphql/client';
 import LOGIN_MUTATION from './graphql/login.mutation';
@@ -6,7 +7,17 @@ import REGISTER_MUTATION from './graphql/register.mutation';
 const USER_TOKEN = 'auth-token';
 
 export const getAuthToken = () => {
-    return storage.get(USER_TOKEN);
+    return new Promise((resolve, reject) => {
+        storage.get(USER_TOKEN)
+            .then(token => {
+                if (!token) {
+                    resolve(null);
+                }
+                const payload = JSON.parse(atob(token.split('.')[1]))
+                resolve(payload);
+            })
+            .catch(err => reject(err));
+    })
 }
 
 export const onSignIn = (identifier, password) => {
