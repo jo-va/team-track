@@ -1,27 +1,60 @@
 import React from 'react';
-import { Scene, Router, Actions } from 'react-native-router-flux';
-import Dashboard from './screens/dashboard.screen';
-import Login from './screens/login.screen';
-import Participate from './screens/participate.screen';
-import Profile from './screens/profile.screen';
-import Register from './screens/register.screen';
+import { StackNavigator, TabNavigator, SwitchNavigator } from 'react-navigation';
+import { FontAwesome } from 'react-native-vector-icons';
+import SignUp from './screens/SignUp';
+import SignIn from './screens/SignIn';
+import Home from './screens/Home';
+import Profile from './screens/Profile';
 
-const RouterComponent = () => {
-    return (
-        <Router>
-            <Scene key='root' hideNavBar>
-                <Scene key='auth' initial>
-                    <Scene key='login' component={Login} title='Please Login' hideNavBar initial />
-                    <Scene key='register' component={Register} title='Please Register' hideNavBar />
-                </Scene>
-                <Scene key='participate' component={Participate} title='Secret code' hideNavBar />
-                <Scene key='main'>
-                    <Scene key='dashboard' component={Dashboard} title='Dashboard' initial />
-                    <Scene key='profile' component={Profile} title='Profile' />
-                </Scene>
-            </Scene>
-        </Router>
+/*const mapNavigationStateParamsToProps = (SomeComponent) => {
+    return class extends React.Component {
+        static navigationOptions = SomeComponent.navigationOptions;
+        render() {
+            const { navigation, ...otherProps } = this.props;
+            const { state: { params } } = navigation;
+            return <SomeComponent {...this.props} {...params} />;
+        }
+    }
+}*/
+
+export const SignedOut = StackNavigator({
+    SignUp: { screen: SignUp },
+    SignIn: { screen: SignIn }
+});
+
+export const SignedIn = TabNavigator({
+    Home: {
+        screen: Home,
+        navigationOptions: {
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ tintColor }) => (
+                <FontAwesome name='home' size={30} color={tintColor} />
+            )
+        }
+    },
+    Profile: {
+        screen: Profile,
+        navigationOptions: {
+            tabBarLabel: 'Profile',
+            tabBarIcon: ({ tintColor }) => (
+                <FontAwesome name='user' size={30} color={tintColor} />
+            )
+        }
+    }
+});
+
+export const createRootNavigator = (signedIn = false) => {
+    return SwitchNavigator(
+        {
+            SignedIn: {
+                screen: SignedIn
+            },
+            SignedOut: {
+                screen: SignedOut
+            }
+        },
+        {
+            initialRouteName: signedIn ? 'SignedIn' : 'SignedOut'
+        }
     );
 };
-
-export default RouterComponent;

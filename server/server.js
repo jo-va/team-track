@@ -40,7 +40,7 @@ const addUser = async (req) => {
     req.next();
 };
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms'));
+app.use(morgan(':method :url :status :req[authorization] :res[content-length] - :response-time ms'));
 app.use(cors('*'));
 app.use(addUser);
 

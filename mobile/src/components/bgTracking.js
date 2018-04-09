@@ -13,7 +13,7 @@ class BgTracking extends Component {
             debug: true,
             startOnBoot: false,
             stopOnTerminate: false,
-            locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
+            locationProvider: BackgroundGeolocation.RAW_PROVIDER,
             interval: 10000,
             fastestInterval: 5000,
             activitiesInterval: 10000,
