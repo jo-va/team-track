@@ -1,11 +1,12 @@
 import React from 'react';
 import validatejs from 'validate.js';
+import { Actions } from 'react-native-router-flux';
 import { View, Text, StyleSheet, UIManager } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
-import { Spinner, FormInput, Hr } from '../components';
-import { onSignIn } from '../auth';
+import { FormInput, Hr } from '../components';
+import { onSignIn } from '../services/auth';
 
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -37,10 +38,6 @@ const INITIAL_STATE = {
 };
 
 class SignIn extends React.Component {
-    static navigationOptions = {
-        header: null
-    };
-
     constructor(props) {
         super(props);
 
@@ -59,7 +56,7 @@ class SignIn extends React.Component {
 
             onSignIn(this.state.identifier, this.state.password)
                 .then(() => {
-                    this.props.navigation.navigate('SignedIn');
+                    Actions.reset('main');
                 })
                 .catch(err => {
                     this.setState(prevState => ({ ...prevState, loading: false }));

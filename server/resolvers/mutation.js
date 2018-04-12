@@ -1,79 +1,89 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, Participant, Group, Event } from '../models';
+import { User, Group, Event } from '../models';
 // import socket from '../socket';
 
-const checkAuth = (user) => {
-    if (!user) {
-        throw new Error('You are not authenticated');
+const mustBeAuthenticated = ctx => {
+    if (!ctx.user) {
+        throw new Error('Unauthorized');
     }
 };
 
-const checkAdmin = (user) => {
-    if (!user || !user.isAdmin) {
-        throw new Error('You are not authorized');
+const mustBeAdmin = ctx => {
+    if (!ctx.user || !ctx.user.isAdmin) {
+        throw new Error('Unauthorized');
     }
 };
 
 export const Mutation = {
-    createGroup: async (root, group, { user }) => {
-        checkAuth(user);
-        checkAdmin(user);
+    createGroup: async (root, group, ctx) => {
+        mustBeAdmin(ctx);
         return Group.create(group);
     },
 
-    createEvent: async (root, event, { user }) => {
-        checkAuth(user);
-        checkAdmin(user);
+    createEvent: async (root, event, ctx) => {
+        mustBeAdmin(ctx);
         return Event.create(event);
     },
 
-    register: async (root, { username, email, password }, { secret }) => {
+    signUp: async (root, { username, email, password }, ctx) => {
         const hash = await bcrypt.hash(password, 12);
         const user = await User.create({ username, email, password: hash });
 
-        const token = jwt.sign(
+        user.jwt = jwt.sign(
             {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                isAdmin: false,
+                group: null,
+                version: 1
             },
-            secret,
+            ctx.secret,
             { expiresIn: '1w' }
         );
-        return token;
+
+        ctx.user = user;
+
+        return user;
     },
 
-    login: async (root, { emailOrUsername, password }, { secret }) => {
+    signIn: async (root, { emailOrUsername, password }, ctx) => {
         const user = await User.findByEmailOrUsername(emailOrUsername);
         if (!user) {
-            throw new Error('User not found');
+            throw new Error('Invalid username or password');
         }
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) {
-            throw new Error('Incorrect password');
+            throw new Error('Invalid username or password');
         }
 
-        const token = jwt.sign(
+        user.jwt = jwt.sign(
             {
                 id: user.id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                isAdmin: user.isAdmin,
+                group: user.group,
+                version: user.version
             },
-            secret,
+            ctx.secret,
             { expiresIn: '1w' }
         );
-        return token;
+
+        ctx.user = user;
+
+        return user;
     },
 
-    participate: async (root, { secretToken }, { user }) => {
-        checkAuth(user);
-        // socket.publish('EVENT_CREATED', { userAdded: user });
-        return Participant.create(user.id, secretToken);
+    joinGroup: async (root, { secretToken }, ctx) => {
+        mustBeAuthenticated(ctx);
+        // socket.publish('USER_JOINED_GROUP', { userJoinedGroup: user });
+        return User.joinGroup(ctx.user.id, secretToken);
     },
 
-    updatePosition: async (root, { latitude, longitude }, { user }) => {
-        checkAuth(user);
-        return Participant.updatePosition(user.id, latitude, longitude);
+    updatePosition: async (root, { latitude, longitude }, ctx) => {
+        mustBeAuthenticated(ctx);
+        return User.updatePosition(ctx.user.id, latitude, longitude);
     }
 };

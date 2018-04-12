@@ -1,7 +1,8 @@
 import React from 'react';
+import { Actions } from 'react-native-router-flux';
 import { View } from 'react-native';
 import { Card, Button, Text } from 'react-native-elements';
-import { onSignOut, getAuthToken } from '../auth';
+import { onSignOut, getUserToken } from '../services/auth';
 
 class Profile extends React.Component {
     constructor(props) {
@@ -13,9 +14,9 @@ class Profile extends React.Component {
     }
 
     componentWillMount() {
-        getAuthToken().then(res => {
-            if (res && res.username) {
-                this.setState(prevState => ({ ...prevState, username: res.username }));
+        getUserToken().then(user => {
+            if (user && user.username) {
+                this.setState(prevState => ({ ...prevState, username: user.username }));
             }
         });
     }
@@ -44,7 +45,7 @@ class Profile extends React.Component {
                     <Button
                         backgroundColor='#03A9F4'
                         title='SIGN OUT'
-                        onPress={() => onSignOut().then(() => this.props.navigation.navigate('SignedOut'))}
+                        onPress={() => onSignOut().then(() => Actions.reset('auth'))}
                     />
                 </Card>
             </View>

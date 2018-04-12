@@ -1,12 +1,13 @@
 import React from 'react';
 import validatejs from 'validate.js';
+import { Actions } from 'react-native-router-flux';
 import { View, Text, StyleSheet, UIManager } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
-import { Spinner, FormInput, Hr } from '../components';
-import { onSignUp } from '../auth';
-import { isBlank } from '../common';
+import { FormInput, Hr } from '../components';
+import { onSignUp } from '../services/auth';
+import { isBlank } from '../utils';
 
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -65,10 +66,6 @@ const INITIAL_STATE = {
 };
 
 class SignUp extends React.Component {
-    static navigationOptions = {
-        header: null
-    };
-
     constructor(props) {
         super(props);
 
@@ -86,7 +83,7 @@ class SignUp extends React.Component {
     }
 
     signIn() {
-        this.props.navigation.navigate('SignIn');
+        Actions.signIn();
     }
 
     signUp() {
@@ -95,7 +92,7 @@ class SignUp extends React.Component {
 
             onSignUp(this.state.email, this.state.username, this.state.password)
                 .then(() => {
-                    this.props.navigation.navigate('SignedIn');
+                    Actions.reset('enroll');
                 })
                 .catch(err => {
                     this.setState(prevState => ({ ...prevState, loading: false }));

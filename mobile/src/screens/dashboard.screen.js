@@ -14,7 +14,7 @@ import {
     Container,
     Spinner
 } from '../components';
-import { storage } from '../common';
+import storage from '../services/storage';
 import PARTICIPANT_QUERY from '../graphql/participant.query';
 
 class Dashboard extends React.Component {

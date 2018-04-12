@@ -1,19 +1,24 @@
 //import jwt from 'jsonwebtoken';
-import { storage } from './common';
-import apolloClient from './graphql/client';
-import LOGIN_MUTATION from './graphql/login.mutation';
-import REGISTER_MUTATION from './graphql/register.mutation';
+import Storage from './storage';
+import apolloClient from '../graphql/client';
+import SIGNIN_MUTATION from '../graphql/signIn.mutation';
+import SIGNUP_MUTATION from '../graphql/signUp.mutation';
+import { Base64 } from '../utils';
 
 const USER_TOKEN = 'auth-token';
 
 export const getAuthToken = () => {
+    return Storage.get(USER_TOKEN);
+};
+
+export const getUserToken = () => {
     return new Promise((resolve, reject) => {
-        storage.get(USER_TOKEN)
+        Storage.get(USER_TOKEN)
             .then(token => {
                 if (!token) {
                     resolve(null);
                 }
-                const payload = JSON.parse(atob(token.split('.')[1]))
+                const payload = JSON.parse(Base64.atob(token.split('.')[1]))
                 resolve(payload);
             })
             .catch(err => reject(err));
@@ -23,14 +28,17 @@ export const getAuthToken = () => {
 export const onSignIn = (identifier, password) => {
     return new Promise((resolve, reject) => {
         apolloClient.mutate({
-            mutation: LOGIN_MUTATION,
+            mutation: SIGNIN_MUTATION,
             variables: {
                 emailOrUsername: identifier,
                 password
             }
         }).then(({ data }) => {
-            storage.set(USER_TOKEN, data.jwt)
-                .then(res => resolve(res))
+            console.log(data);
+            Storage.set(USER_TOKEN, data.signIn.jwt)
+                .then(res => {
+                    resolve(res);
+                })
                 .catch(err => reject(err));
         }).catch(err => {
             reject(err);
@@ -41,10 +49,11 @@ export const onSignIn = (identifier, password) => {
 export const onSignUp = (email, username, password) => {
     return new Promise((resolve, reject) => {
         apolloClient.mutate({
-            mutation: REGISTER_MUTATION,
+            mutation: SIGNUP_MUTATION,
             variables: { email, username, password }
         }).then(({ data }) => {
-            storage.set(USER_TOKEN, data.jwt)
+            console.log(data);
+            Storage.set(USER_TOKEN, data.signUp.jwt)
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         }).catch(err => {
@@ -54,21 +63,5 @@ export const onSignUp = (email, username, password) => {
 };
 
 export const onSignOut = () => {
-    return storage.remove(USER_TOKEN);
-};
-
-export const isSignedIn = () => {
-    return new Promise((resolve, reject) => {
-        storage.get(USER_TOKEN)
-            .then(res => {
-                if (res !== null) {
-                    resolve(true);
-                } else {
-                    resolve(false);
-                }
-            })
-            .catch(err => {
-                reject(err);
-            });
-    });
+    return Storage.remove(USER_TOKEN);
 };

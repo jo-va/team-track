@@ -20,40 +20,38 @@ const KeyValueItem = {
     }
 };
 
-class Storage {
-    constructor() {
-        this.realm = new Realm({
-            schema: [KeyValueItem],
-            schemaVersion: 1
-        });
-    }
+const repository = new Realm({
+    schema: [KeyValueItem],
+    schemaVersion: 1
+});
 
-    get(key) {
+const Storage = {
+    get: function(key) {
         return new Promise((resolve, reject) => {
-            const result = this.realm.objects('KeyValueItem').filtered(`key = "${key}"`);
+            const result = repository.objects('KeyValueItem').filtered(`key = "${key}"`);
             resolve(result && result[0] ? result[0].value : null);
         });
-    }
+    },
     
-    set(key, value) {
+    set: function(key, value) {
         return new Promise((resolve, reject) => {
             try {
-                this.realm.write(() => {
-                    this.realm.create('KeyValueItem', { key, value }, true);
+                repository.write(() => {
+                    repository.create('KeyValueItem', { key, value }, true);
                 });
                 resolve();
             } catch (err) {
                 reject(err);
             }
         })
-    }
+    },
     
-    remove(key) {
+    remove: function(key) {
         return new Promise((resolve, reject) => {
             try {
-                this.realm.write(() => {
-                    const object = this.realm.objects('KeyValueItem').filtered(`key = "${key}"`);
-                    this.realm.delete(object);
+                repository.write(() => {
+                    const object = repository.objects('KeyValueItem').filtered(`key = "${key}"`);
+                    repository.delete(object);
                 });
                 resolve();
             } catch (err) {
@@ -61,6 +59,6 @@ class Storage {
             }
         });
     }
-}
+};
 
-export let storage = new Storage();
+export default Storage;

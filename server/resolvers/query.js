@@ -1,32 +1,25 @@
-import { Participant, Group, Event } from '../models';
+import { User, Group, Event } from '../models';
 
 export const Query = {
-    /*participant: (root, { id }) => {
-        return Participant.findById(id);
-    },*/
-    participants: (root, { group }) => {
-        return Participant.findAllByGroupId(group);
+    currentUser: (root, args, { user }) => {
+        return user;
+    },
+    user: (root, { id }) => {
+        return User.findById(id);
+    },
+    users: () => {
+        return User.findAll();
     },
     group: (root, { id }) => {
         return Group.findById(id);
     },
-    groups: (root, { event }) => {
-        return Group.findAllByEventId(event);
+    groups: () => {
+        return Group.findAll();
     },
     event: (root, { id }) => {
         return Event.findById(id);
     },
     events: () => {
         return Event.findAll();
-    },
-
-    user: (root, args, { user }) => {
-        return user;
-    },
-    participant: (root, args, { user }) => {
-        if (user) {
-            return Participant.findByUserId(user.id);
-        }
-        return null;
     }
 };

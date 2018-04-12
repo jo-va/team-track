@@ -1,38 +1,45 @@
 import React from 'react';
 import { ApolloProvider } from 'react-apollo';
-import { storage } from './common';
-import { isSignedIn } from './auth';
-import { createRootNavigator } from './router';
+import { Actions } from 'react-native-router-flux';
+import { getUserToken } from './services/auth';
+import Router from './router';
 import apolloClient from './graphql/client';
+import { Spinner } from './components';
 
 class App extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            signedIn: false,
-            checkedSignIn: false
+            canNavigate: false
         };
     }
 
-    componentDidMount() {
-        isSignedIn()
-            .then(res => this.setState({ signedIn: res, checkedSignIn: true }))
-            .catch(err => alert('An error occured'));
+    async componentDidMount() {
+        try {
+            const userToken = await getUserToken();
+            console.log(userToken);
+            if (userToken && userToken.group) {
+                console.log('main');
+                //Actions.reset('main');
+            } else if (userToken) {
+                console.log('main');
+                //Actions.reset('enroll');
+            }
+            this.setState(prevState => ({ ...prevState, canNavigate: true }));
+        } catch (err) {
+            alert('An error occured: ' + err);
+        }
     }
 
     render() {
-        const { checkedSignIn, signedIn } = this.state;
-
-        if (!checkedSignIn) {
-            return null;
+        if (!this.state.canNavigate) {
+            return <Spinner />;
         }
-
-        const Layout = createRootNavigator(signedIn);
 
         return (
             <ApolloProvider client={apolloClient}>
-                <Layout />
+                <Router />
             </ApolloProvider>
         );
     }

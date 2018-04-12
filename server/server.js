@@ -26,21 +26,25 @@ const addUser = async (req) => {
     try {
         const bearerLength = 'Bearer '.length;
         const { authorization } = req.headers;
+
         if (authorization && authorization.length > bearerLength) {
             const token = authorization.slice(bearerLength);
             if (token) {
-                const { id } = await jwt.verify(token, process.env.JWT_SECRET);
-                const existingUser = await User.findById(id);
+                const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+                const existingUser = await User.findById(decoded.id);
                 req.user = existingUser;
+                if (req.user) {
+                    req.user.jwt = token;
+                }
             }
         }
     } catch (err) {
-        console.log(err);
+        console.log('JWT error: ', err.message);
     }
     req.next();
 };
 
-app.use(morgan(':method :url :status :req[authorization] :res[content-length] - :response-time ms'));
+app.use(morgan(':date[iso] - :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms'));
 app.use(cors('*'));
 app.use(addUser);
 
@@ -59,7 +63,7 @@ app.use(
                 user: req.user,
                 secret: process.env.JWT_SECRET
             },
-            debug: true
+            debug: process.env.ENVIRONMENT === 'dev'
         };
     })
 );

@@ -1,6 +1,10 @@
 import { Types } from 'mongoose';
 import * as db from '../connectors';
 
+const findAll = () => {
+    return db.Group.find({});
+};
+
 const findAllByEventId = (event) => {
     if (event) {
         return Types.ObjectId.isValid(event) ? db.Group.find({ event }) : [];
@@ -55,7 +59,6 @@ const create = async (group) => {
 export const Group = {
     findAllByEventId,
     findById,
-    findByName,
-    findBySecretToken,
+    findAll,
     create
 };

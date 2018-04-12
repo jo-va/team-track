@@ -5,7 +5,6 @@ import Mutation from './mutation.graphql';
 import Subscription from './subscription.graphql';
 
 import User from './user.graphql';
-import Participant from './participant.graphql';
 import Group from './group.graphql';
 import Event from './event.graphql';
 
@@ -15,7 +14,6 @@ export default [
     Mutation,
     Subscription,
     User,
-    Participant,
     Group,
     Event
 ];

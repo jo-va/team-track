@@ -23,26 +23,14 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    avatar: {
-        type: String,
-        default: null
-    },
     isAdmin: {
         type: Boolean,
         default: false
-    }
-});
-
-const ParticipantSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
     },
     group: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group',
-        required: true
+        default: null
     },
     distance: {
         type: Number,
@@ -61,6 +49,10 @@ const ParticipantSchema = new mongoose.Schema({
         type: String,
         default: 'inactive',
         enum: ['active', 'inactive']
+    },
+    version: {
+        type: Number,
+        default: 1
     }
 });
 
@@ -123,12 +115,10 @@ const EventSchema = new mongoose.Schema({
 });
 
 UserSchema.plugin(uniqueValidator);
-ParticipantSchema.plugin(uniqueValidator);
 GroupSchema.plugin(uniqueValidator);
 EventSchema.plugin(uniqueValidator);
 
 export const User = mongoose.model('User', UserSchema);
-export const Participant = mongoose.model('Participant', ParticipantSchema);
 export const Group = mongoose.model('Group', GroupSchema);
 export const Event = mongoose.model('Event', EventSchema);
 
