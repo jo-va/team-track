@@ -3,9 +3,9 @@ import gql from 'graphql-tag';
 const LOGIN_MUTATION = gql`
 	mutation login($emailOrUsername: String!, $password: String!) {
 		login(emailOrUsername: $emailOrUsername, password: $password) {
-			id
-			jwt
-			username
+            id
+            jwt
+            username
 		}
 	}
 `;

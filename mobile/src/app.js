@@ -70,7 +70,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     let shouldLogout = false;
     if (graphQLErrors) {
         console.log({ graphQLErrors });
-        graphQLErrors.forEach(({ message, locations, paht }) => {1651
+        graphQLErrors.forEach(({ message, locations, path }) => {1651
             console.log({ message, locations, path});
             if (message === 'Unauthorized') {
                 shouldLogout = true;

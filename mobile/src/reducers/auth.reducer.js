@@ -13,6 +13,8 @@ const auth = (state = initialState, action) => {
             const { payload = { } } = action;
             return Immutable(payload.auth || state).set('loading', false);
         case SET_CURRENT_USER:
+            return state.merge(action.user);
+        case LOGOUT:
             return Immutable({ loading: false });
         default:
             return state;

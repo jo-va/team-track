@@ -2,18 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, Group, Event } from '../models';
 // import socket from '../socket';
-
-const mustBeAuthenticated = ctx => {
-    if (!ctx.user) {
-        throw new Error('Unauthorized');
-    }
-};
-
-const mustBeAdmin = ctx => {
-    if (!ctx.user || !ctx.user.isAdmin) {
-        throw new Error('Unauthorized');
-    }
-};
+import { mustBeAdmin, mustBeAuthenticated } from './security';
 
 export const Mutation = {
     createGroup: async (root, group, ctx) => {
@@ -33,10 +22,7 @@ export const Mutation = {
         user.jwt = jwt.sign(
             {
                 id: user.id,
-                username: user.username,
                 email: user.email,
-                isAdmin: false,
-                group: null,
                 version: 1
             },
             ctx.secret,
@@ -61,10 +47,7 @@ export const Mutation = {
         user.jwt = jwt.sign(
             {
                 id: user.id,
-                username: user.username,
                 email: user.email,
-                isAdmin: user.isAdmin,
-                group: user.group,
                 version: user.version
             },
             ctx.secret,

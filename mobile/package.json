@@ -27,7 +27,6 @@
         "react-navigation": "^1.5.11",
         "react-navigation-redux-helpers": "^1.0.5",
         "react-redux": "^5.0.7",
-        "realm": "2.2.8",
         "redux": "^3.7.2",
         "redux-devtools-extension": "^2.13.2",
         "redux-persist": "^5.9.1",

@@ -12,7 +12,7 @@ const findById = (id) => {
 };
 
 const findByIdAndVersion = (id, version) => {
-    return db.User.findOne({ id, version });
+    return db.User.findOne({ _id: id, version });
 };
 
 const findByEmailOrUsername = (value) => {

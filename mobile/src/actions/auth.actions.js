@@ -1,4 +1,4 @@
-import { cient } from '../app';
+import { client } from '../app';
 import { LOGOUT, SET_CURRENT_USER } from '../constants/constants';
 
 export const setCurrentUser = user => ({

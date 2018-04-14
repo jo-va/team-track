@@ -6,16 +6,12 @@ import {
     Text,
     Alert
 } from 'react-native';
-import { Query } from 'react-apollo';
-import { Actions } from 'react-native-router-flux';
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation';
 import {
     Button,
     Container,
     Spinner
 } from '../components';
-import storage from '../services/storage';
-import PARTICIPANT_QUERY from '../graphql/participant.query';
 
 class Dashboard extends React.Component {
     constructor(props) {
@@ -23,8 +19,6 @@ class Dashboard extends React.Component {
     }
 
     async componentDidMount() {
-        const authToken = await storage.get('auth_token');
-
         BackgroundGeolocation.configure({
             desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
             stationaryRadius: 50,
@@ -39,12 +33,12 @@ class Dashboard extends React.Component {
             fastestInterval: 5000,
             activitiesInterval: 10000,
             stopOnStillActivity: false,
-            url: 'http://192.168.0.183:3000/graphql',
+            url: null,//'http://192.168.0.183:3000/graphql',
             httpHeaders: {
-                'authorization': `Bearer ${authToken}`
+                //'authorization': null
             },
             postTemplate: {
-                query: 'mutation { updatePosition(latitude: @latitude, longitude: @longitude) }'
+                //query: 'mutation { move(latitude: @latitude, longitude: @longitude) }'
             }
         });
 
@@ -103,7 +97,7 @@ class Dashboard extends React.Component {
 
             // you don't need to check status before start (this is just the example)
             if (!status.isRunning) {
-                BackgroundGeolocation.start(); //triggers start on start event
+                //BackgroundGeolocation.start(); //triggers start on start event
             }
         });
     }
@@ -111,37 +105,14 @@ class Dashboard extends React.Component {
     componentWillUnmount() {
         // unregister all event listeners
         BackgroundGeolocation.events.forEach(event => BackgroundGeolocation.removeAllListeners(event));
-    }
-
-    async logout() {
-        console.log(await storage.get('auth_token'));
-        storage.remove('auth_token');
-        Actions.reset('auth');
+        BackgroundGeolocation.stop();
     }
 
     render() {
         return (
-            <Query
-                query={PARTICIPANT_QUERY}
-            >
-                {({ loading, data: { participant } }) => {
-                    if (loading) {
-                        return <Spinner />;
-                    }
-                    return (
-                        <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
-                            <Text>Welcome {participant && participant.username}</Text>
-                            <Container>
-                                <Button
-                                    label='Logout'
-                                    styles={{button: styles.primaryButton, label: styles.buttonWhiteText}}
-                                    onPress={this.logout.bind(this)}
-                                />
-                            </Container>
-                        </ScrollView>
-                    );
-                }}
-            </Query>
+            <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
+                <Text>Welcome</Text>
+            </ScrollView>
         );
     }
 }
@@ -153,14 +124,8 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         flexGrow: 1,
-        justifyContent: 'center'
-    },	
-    primaryButton: {
-        backgroundColor: '#34a853'
-    },
-    buttonWhiteText: {
-        fontSize: 20,
-        color: '#fff'
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 });
 

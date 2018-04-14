@@ -1,25 +1,33 @@
 import { User, Group, Event } from '../models';
+import { mustBeAuthenticated } from './security';
 
 export const Query = {
-    me: (root, args, { user }) => {
-        return user;
+    me: (root, args, ctx) => {
+        mustBeAuthenticated(ctx);
+        return ctx.user;
     },
-    user: (root, { id }) => {
+    user: (root, { id }, ctx) => {
+        mustBeAuthenticated(ctx);
         return User.findById(id);
     },
-    users: () => {
+    users: (root, args, ctx) => {
+        mustBeAuthenticated(ctx);
         return User.findAll();
     },
-    group: (root, { id }) => {
+    group: (root, { id }, ctx) => {
+        mustBeAuthenticated(ctx);
         return Group.findById(id);
     },
-    groups: () => {
+    groups: (root, args, ctx) => {
+        mustBeAuthenticated(ctx);
         return Group.findAll();
     },
-    event: (root, { id }) => {
+    event: (root, { id }, ctx) => {
+        mustBeAuthenticated(ctx);
         return Event.findById(id);
     },
-    events: () => {
+    events: (root, args, ctx) => {
+        mustBeAuthenticated(ctx);
         return Event.findAll();
     }
 };

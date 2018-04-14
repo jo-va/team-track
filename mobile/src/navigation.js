@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
     NavigationActions,
     addNavigationHelpers,
@@ -9,41 +10,22 @@ import {
     createReduxBoundAddListener,
     createReactNavigationReduxMiddleware
 } from 'react-navigation-redux-helpers';
-import { Text, View, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
+import { graphql, compose } from 'react-apollo';
 import { REHYDRATE } from 'redux-persist';
+
+import Dashboard from './screens/dashboard.screen';
+import Settings from './screens/settings.screen';
 import Signin from './screens/signin.screen';
 import Join from './screens/join.screen';
+
 import { LOGOUT } from './constants/constants';
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'white'
-    },
-    tabText: {
-        color: '#777',
-        fontSize: 10,
-        justifyContent: 'center'
-    },
-    selected: {
-        color: 'blue'
-    }
-});
-
-const TestScreen = title => () => (
-    <View style={styles.container}>
-        <Text>{title}</Text>
-    </View>
-);
+import ME_QUERY from './graphql/me.query';
 
 // tabs in main screen
 const MainScreenNavigation = TabNavigator({
-    Dashboard: { screen: TestScreen('Dashboard') },
-    Profile: { screen: TestScreen('Profile') },
-    Settings: { screen: TestScreen('Settings') }
+    Dashboard: { screen: Dashboard },
+    Settings: { screen: Settings }
 }, {
     initialRouteName: 'Dashboard'
 });
@@ -126,8 +108,44 @@ class AppWithNavigationState extends React.Component {
     }
 }
 
-const mapStateToProps = state => ({
-    nav: state.nav
+AppWithNavigationState.propTypes = {
+    auth: PropTypes.shape({
+        id: PropTypes.string,
+        jwt: PropTypes.string
+    }),
+    dispatch: PropTypes.func.isRequired,
+    nav: PropTypes.object.isRequired,
+    refetch: PropTypes.func,
+    user: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        email: PropTypes.string.isRequired,
+        distance: PropTypes.number.isRequired,
+        group: PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            distance: PropTypes.number.isRequired,
+            event: PropTypes.shape({
+                name: PropTypes.string.isRequired,
+                distance: PropTypes.number.isRequired
+            })
+        })
+    })
+};
+
+const mapStateToProps = ({ auth, nav }) => ({
+    auth,
+    nav
 });
 
-export default connect(mapStateToProps)(AppWithNavigationState);
+const meQuery = graphql(ME_QUERY, {
+    skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
+    props: ({ data: { loading, refetch, me } }) => ({
+        loading,
+        refetch,
+        user: me
+    })
+});
+
+export default compose(
+    connect(mapStateToProps),
+    meQuery
+)(AppWithNavigationState);

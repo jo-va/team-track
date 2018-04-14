@@ -1,10 +1,5 @@
 import { Group } from '../models';
-
-const mustBeCurrentUserOrAdmin = (user, ctx) => {
-    if (!ctx.user || (ctx.user.id !== user.id && !ctx.user.isAdmin)) {
-        throw new Error('Unauthorized');
-    }
-};
+import { mustBeCurrentUserOrAdmin } from './security';
 
 export const User = {
     group: (user) => {

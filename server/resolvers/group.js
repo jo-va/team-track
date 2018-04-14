@@ -1,10 +1,5 @@
 import { User, Event } from '../models';
-
-const mustBeAdmin = (ctx) => {
-    if (!ctx.user || !ctx.user.isAdmin) {
-        throw new Error('Unauthorized');
-    }
-};
+import { mustBeAdmin } from './security';
 
 export const Group = {
     event: (group) => {
