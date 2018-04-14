@@ -1,9 +1,7 @@
-const isEmpty = (str) => !str || 0 === str.length;
-
-const isBlank = (str) => !str || str.trim().length === 0;
-
 // Inspired by: https://github.com/davidchambers/Base64.js/blob/master/base64.js
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+//const payload = JSON.parse(Base64.atob(token.split('.')[1]))
 
 const Base64 = {
     btoa: (input = '')  => {
@@ -45,4 +43,4 @@ const Base64 = {
     }
 };
 
-export { isEmpty, isBlank, Base64 };
+export { Base64 };

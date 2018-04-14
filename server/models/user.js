@@ -11,6 +11,10 @@ const findById = (id) => {
     return db.User.findById(id);
 };
 
+const findByIdAndVersion = (id, version) => {
+    return db.User.findOne({ id, version });
+};
+
 const findByEmailOrUsername = (value) => {
     return db.User.findOne({ $or: [{ email: value }, { username: value }] });
 };
@@ -105,6 +109,7 @@ const updatePosition = async (userId, latitude, longitude) => {
 export const User = {
     findAll,
     findById,
+    findByIdAndVersion,
     findByEmailOrUsername,
     findAllByGroupId,
     create,

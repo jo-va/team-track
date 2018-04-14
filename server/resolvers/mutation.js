@@ -26,7 +26,7 @@ export const Mutation = {
         return Event.create(event);
     },
 
-    signUp: async (root, { username, email, password }, ctx) => {
+    signup: async (root, { username, email, password }, ctx) => {
         const hash = await bcrypt.hash(password, 12);
         const user = await User.create({ username, email, password: hash });
 
@@ -48,7 +48,7 @@ export const Mutation = {
         return user;
     },
 
-    signIn: async (root, { emailOrUsername, password }, ctx) => {
+    login: async (root, { emailOrUsername, password }, ctx) => {
         const user = await User.findByEmailOrUsername(emailOrUsername);
         if (!user) {
             throw new Error('Invalid username or password');
@@ -76,13 +76,13 @@ export const Mutation = {
         return user;
     },
 
-    joinGroup: async (root, { secretToken }, ctx) => {
+    join: async (root, { secretToken }, ctx) => {
         mustBeAuthenticated(ctx);
         // socket.publish('USER_JOINED_GROUP', { userJoinedGroup: user });
         return User.joinGroup(ctx.user.id, secretToken);
     },
 
-    updatePosition: async (root, { latitude, longitude }, ctx) => {
+    move: async (root, { latitude, longitude }, ctx) => {
         mustBeAuthenticated(ctx);
         return User.updatePosition(ctx.user.id, latitude, longitude);
     }

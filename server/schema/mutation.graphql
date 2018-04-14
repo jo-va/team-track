@@ -9,11 +9,11 @@ type Mutation {
     #stopEvent(id: ID!): Event
 
     # Register a new user and log the user in, returns a User
-    signUp(username: String!, email: String!, password: String!): User
+    signup(username: String!, email: String!, password: String!): User
     # login, must be registered first, returns a User
-    signIn(emailOrUsername: String!, password: String!): User
+    login(emailOrUsername: String!, password: String!): User
     # Participate to the event, must be logged in, must provide the secret to be associated to a group
-    joinGroup(secretToken: String!): User
+    join(secretToken: String!): User
     # Update the position of the logged in user
-    updatePosition(latitude: Float, longitude: Float): User
+    move(latitude: Float, longitude: Float): User
 }

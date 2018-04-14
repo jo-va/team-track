@@ -31,7 +31,7 @@ const addUser = async (req) => {
             const token = authorization.slice(bearerLength);
             if (token) {
                 const decoded = await jwt.verify(token, process.env.JWT_SECRET);
-                const existingUser = await User.findById(decoded.id);
+                const existingUser = await User.findByIdAndVersion(decoded.id, decoded.version);
                 req.user = existingUser;
                 if (req.user) {
                     req.user.jwt = token;

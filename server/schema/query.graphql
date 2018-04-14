@@ -1,5 +1,5 @@
 type Query {
-    currentUser: User
+    me: User
 
     user(id: ID!): User
     users: [User]

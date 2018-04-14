@@ -1,7 +1,7 @@
 import { User, Group, Event } from '../models';
 
 export const Query = {
-    currentUser: (root, args, { user }) => {
+    me: (root, args, { user }) => {
         return user;
     },
     user: (root, { id }) => {
