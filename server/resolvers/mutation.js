@@ -1,28 +1,28 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, Group, Event } from '../models';
+import { User, Participant, Group, Event } from '../models';
 // import socket from '../socket';
 import { mustBeAdmin, mustBeAuthenticated } from './security';
 
 export const Mutation = {
-    createGroup: async (root, group, ctx) => {
+    addGroup: async (root, group, ctx) => {
         mustBeAdmin(ctx);
-        return Group.create(group);
+        return Group.add(group);
     },
 
-    createEvent: async (root, event, ctx) => {
+    addEvent: async (root, event, ctx) => {
         mustBeAdmin(ctx);
-        return Event.create(event);
+        return Event.add(event);
     },
 
-    signup: async (root, { username, email, password }, ctx) => {
+    signup: async (root, { username, password }, ctx) => {
         const hash = await bcrypt.hash(password, 12);
-        const user = await User.create({ username, email, password: hash });
+        const user = await User.add({ username, password: hash });
 
         user.jwt = jwt.sign(
             {
+                type: 'user',
                 id: user.id,
-                email: user.email,
                 version: 1
             },
             ctx.secret,
@@ -34,8 +34,8 @@ export const Mutation = {
         return user;
     },
 
-    login: async (root, { emailOrUsername, password }, ctx) => {
-        const user = await User.findByEmailOrUsername(emailOrUsername);
+    login: async (root, { username, password }, ctx) => {
+        const user = await User.findByUsername(username);
         if (!user) {
             throw new Error('Invalid username or password');
         }
@@ -46,8 +46,8 @@ export const Mutation = {
 
         user.jwt = jwt.sign(
             {
+                type: 'user',
                 id: user.id,
-                email: user.email,
                 version: user.version
             },
             ctx.secret,
@@ -59,14 +59,27 @@ export const Mutation = {
         return user;
     },
 
-    join: async (root, { secretToken }, ctx) => {
-        mustBeAuthenticated(ctx);
+    join: async (root, { username, secret }, ctx) => {
         // socket.publish('USER_JOINED_GROUP', { userJoinedGroup: user });
-        return User.joinGroup(ctx.user.id, secretToken);
+        const participant = await Participant.add(username, secret);
+
+        participant.jwt = jwt.sign(
+            {
+                type: 'participant',
+                id: participant.id,
+                version: participant.version
+            },
+            ctx.secret,
+            { expiresIn: '1w' }
+        );
+
+        ctx.participant = participant;
+
+        return participant;
     },
 
     move: async (root, { latitude, longitude }, ctx) => {
-        mustBeAuthenticated(ctx);
-        return User.updatePosition(ctx.user.id, latitude, longitude);
+        mustBeAuthenticated(ctx, ctx.participant);
+        return Participant.move(ctx.participant.id, latitude, longitude);
     }
 };

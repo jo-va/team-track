@@ -1,8 +1,12 @@
 type Query {
-    me: User
+    currentUser: User
+    currentParticipant: Participant
 
     user(id: ID!): User
     users: [User]
+
+    participant(id: ID!): Participant
+    participants: [Participant]
 
     group(id: ID!): Group
     groups: [Group]

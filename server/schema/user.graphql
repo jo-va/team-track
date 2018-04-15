@@ -1,12 +1,6 @@
 type User {
     id: ID!,
-    email: String!
     username: String!
     jwt: String!
     isAdmin: Boolean!
-    group: Group
-    distance: Float	
-    latitude: Float
-    longitude: Float
-    state: String
 }

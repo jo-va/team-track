@@ -1,14 +1,14 @@
 import { Event as db } from '../connectors';
 
 const findAll = () => {
-    return db.find({});
+    return db.find({}).exec();
 };
 
 const findById = (id) => {
-    return db.findById(id);
+    return db.findById(id).exec();
 };
 
-const create = (event) => {
+const add = (event) => {
     if (!event.name || !event.name.trim()) {
         throw new Error('Event name cannot be blank');
     }
@@ -18,5 +18,5 @@ const create = (event) => {
 export const Event = {
     findAll,
     findById,
-    create
+    add
 };

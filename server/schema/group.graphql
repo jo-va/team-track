@@ -2,7 +2,7 @@ type Group {
     id: ID!
     name: String!
     event: Event!
-    users: [User]
+    participants: [Participant]
     distance: Float
-    secretToken: String
+    secret: String
 }

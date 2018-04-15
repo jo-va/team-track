@@ -1,13 +1,4 @@
-export const SIGNUP_CONSTRAINTS = {
-    email: {
-        presence: {
-            allowEmpty: false,
-            message: '^Please provide an email address'
-        },
-        email: {
-            message: '^Please enter a valid email adress'
-        }
-    },
+export const SIGNIN_CONSTRAINTS = {
     username: {
         presence: {
             allowEmpty: false,
@@ -33,20 +24,13 @@ export const SIGNUP_CONSTRAINTS = {
             attribute: 'password',
             message: '^Passwords must match'
         }
-    }
-};
-
-export const LOGIN_CONSTRAINTS = {
-    identifier: {
-        presence: {
-            allowEmpty: false,
-            message: '^Please provide a username or email'
-        }
     },
-    password: {
+    Loginpassword: {
         presence: {
             allowEmpty: false,
             message: '^Please enter a password'
         }
     }
 };
+
+export default SIGNIN_CONSTRAINTS;

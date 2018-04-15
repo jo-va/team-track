@@ -13,12 +13,6 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-    },
     password: {
         type: String,
         default: null
@@ -26,6 +20,18 @@ const UserSchema = new mongoose.Schema({
     isAdmin: {
         type: Boolean,
         default: false
+    },
+    version: {
+        type: Number,
+        default: 1
+    }
+});
+
+const ParticipantSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        trim: true
     },
     group: {
         type: mongoose.Schema.Types.ObjectId,
@@ -60,7 +66,6 @@ const GroupSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true,
         trim: true
     },
     event: {
@@ -73,7 +78,7 @@ const GroupSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    secretToken: {
+    secret: {
         type: String,
         default: generateSecret,
         unique: true
@@ -84,7 +89,6 @@ const EventSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        unique: true,
         trim: true
     },
     date: {
@@ -116,9 +120,9 @@ const EventSchema = new mongoose.Schema({
 
 UserSchema.plugin(uniqueValidator);
 GroupSchema.plugin(uniqueValidator);
-EventSchema.plugin(uniqueValidator);
 
 export const User = mongoose.model('User', UserSchema);
+export const Participant = mongoose.model('Participant', ParticipantSchema);
 export const Group = mongoose.model('Group', GroupSchema);
 export const Event = mongoose.model('Event', EventSchema);
 

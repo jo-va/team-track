@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/SimpleLineIcons';
 import { graphql, compose } from 'react-apollo';
 import { connect } from 'react-redux';
 import { FormInput, Hr } from '../components';
-import { LOGIN_CONSTRAINTS, SIGNUP_CONSTRAINTS } from './signin.constraints';
+import SIGNIN_CONSTRAINTS from './signin.constraints';
 import { isBlank } from '../utils/string';
 import { setCurrentUser } from '../actions/auth.actions';
 import LOGIN_MUTATION from '../graphql/login.mutation';
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     error: {
-        fontSize: 20,
+        fontSize: 15,
         color: 'orange',
         paddingBottom: 5,
         fontWeight: 'bold',
@@ -78,12 +78,8 @@ const styles = StyleSheet.create({
 
 const INITIAL_STATE = {
     view: 'login',
-    email: '',
-    emailError: null,
     username: '',
     usernameError: null,
-    identifier: '',
-    identifierError: null,
     password: '',
     passwordError: null,
     loginPassword: '',
@@ -117,9 +113,7 @@ class Signin extends React.Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.validateSignupFields = this.validateSignupFields.bind(this);
         this.validateLoginFields = this.validateLoginFields.bind(this);
-        this.validateEmail = this.validateEmail.bind(this);
         this.validateUsername = this.validateUsername.bind(this);
-        this.validateIdentifier = this.validateIdentifier.bind(this);
         this.validatePassword = this.validatePassword.bind(this);
         this.validateLoginPassword = this.validateLoginPassword.bind(this);
         this.validateConfirmationPassword = this.validateConfirmationPassword.bind(this);
@@ -143,9 +137,9 @@ class Signin extends React.Component {
         if (this.state.canLogin) {
             this.setState({ loading: true });
 
-            const { identifier, loginPassword } = this.state;
+            const { username, loginPassword } = this.state;
 
-            this.props.login(identifier, loginPassword)
+            this.props.login(username, loginPassword)
                 .then(({ data: { login: user } }) => {
                     this.props.dispatch(setCurrentUser(user));
                     this.setState({ loading: false });
@@ -161,9 +155,9 @@ class Signin extends React.Component {
         if (this.state.canSignup) {
             this.setState({ loading: true });
 
-            const { username, email, password } = this.state;
+            const { username, password } = this.state;
 
-            this.props.signup(username, email, password)
+            this.props.signup(username, password)
                 .then(({ data: { signup: user } }) => {
                     this.props.dispatch(setCurrentUser(user));
                     this.setState({ loading: false });
@@ -198,10 +192,10 @@ class Signin extends React.Component {
             username: this.state.username,
             password: this.state.password,
             confirmationPassword: this.state.confirmationPassword
-        }, SIGNUP_CONSTRAINTS);
+        }, SIGNIN_CONSTRAINTS);
 
         const hasErrors = errors !== undefined &&
-            (!!errors.email || !!errors.username || !!errors.password || !!errors.confirmationPassword);
+            (!!errors.username || !!errors.password || !!errors.confirmationPassword);
         this.setState({ signinErrors: [], canSignup: !hasErrors });
 
         return errors;
@@ -209,21 +203,16 @@ class Signin extends React.Component {
 
     validateLoginFields() {
         const errors = validatejs.validate({
-            identifier: this.state.identifier,
-            password: this.state.loginPassword
-        }, LOGIN_CONSTRAINTS);
+            username: this.state.username,
+            loginPassword: this.state.loginPassword
+        }, SIGNIN_CONSTRAINTS);
 
-        const hasErrors = errors !== undefined && (!!errors.identifier || !!errors.password);
+        const hasErrors = errors !== undefined &&
+            (!!errors.username || !!errors.loginPassword);
         this.setState({ signinErrors: [], canLogin: !hasErrors });
 
         return errors;
     }    
-
-    validateEmail() {
-        const errors = this.validateSignupFields();
-        const emailError = errors && errors.email ? errors.email[0] : null;
-        this.setState({ emailError });
-    }
 
     validateUsername() {
         const errors = this.validateSignupFields();
@@ -248,15 +237,9 @@ class Signin extends React.Component {
         this.setState({ confirmationPasswordError });
     }
 
-    validateIdentifier() {
-        const errors = this.validateLoginFields();
-        const identifierError = errors && errors.identifier ? errors.identifier[0] : null;
-        this.setState({ identifierError });
-    }
-
     validateLoginPassword() {
         const errors = this.validateLoginFields();
-        const loginPasswordError = errors && errors.password ? errors.password[0] : null;
+        const loginPasswordError = errors && errors.loginPassword ? errors.loginPassword[0] : null;
         this.setState({ loginPasswordError });
     }
 
@@ -274,24 +257,9 @@ class Signin extends React.Component {
                     onBlur={this.validateUsername}
                     onSubmitEditing={() => {
                         this.validateUsername();
-                        this.emailInput.focus();
-                    }}
-                />
-                <FormInput
-                    refInput={input => (this.emailInput = input)}
-                    icon='envelope'
-                    placeholder='Email'
-                    keyboardType='email-address'
-                    returnKeyType='next'
-                    value={this.state.email}
-                    errorMessage={this.state.emailError}
-                    onChangeText={value => this.handleInputChange('email', value)}
-                    onBlur={this.validateEmail}
-                    onSubmitEditing={() => {
-                        this.validateEmail();
                         this.passwordInput.focus();
                     }}
-                />                                 
+                />                              
                 <FormInput
                     refInput={input => (this.passwordInput = input)}
                     icon='lock'          
@@ -329,16 +297,16 @@ class Signin extends React.Component {
         return (
             <View style={styles.inputsContainer}>
                 <FormInput
-                    refInput={input => (this.identifierInput = input)}
+                    refInput={input => (this.usernameInput = input)}
                     icon='user'
-                    placeholder='Email or Username'
+                    placeholder='Username'
                     returnKeyType='next'
-                    value={this.state.identifier}
-                    errorMessage={this.state.identifierError}
-                    onChangeText={value => this.handleInputChange('identifier', value)}
-                    onBlur={this.validateIdentifier}
+                    value={this.state.username}
+                    errorMessage={this.state.usernameError}
+                    onChangeText={value => this.handleInputChange('username', value)}
+                    onBlur={this.validateUsername}
                     onSubmitEditing={() => {
-                        this.validateIdentifier();
+                        this.validateUsername();
                         this.loginPasswordInput.focus();
                     }}
                 />                              
@@ -431,18 +399,18 @@ Signin.propTypes = {
 
 const login = graphql(LOGIN_MUTATION, {
     props: ({ mutate }) => ({
-        login: (identifier, password) =>
+        login: (username, password) =>
             mutate({
-                variables: { emailOrUsername: identifier, password }
+                variables: { username, password }
             })
     })
 });
 
 const signup = graphql(SIGNUP_MUTATION, {
     props: ({ mutate }) => ({
-        signup: (username, email, password) =>
+        signup: (username, password) =>
             mutate({
-                variables: { username, email, password }
+                variables: { username, password }
             })
     })
 });

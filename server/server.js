@@ -12,7 +12,7 @@ import morgan from 'morgan';
 
 import schema from './schema';
 import resolvers from './resolvers';
-import { User } from './models';
+import { User, Participant } from './models';
 
 const executableSchema = makeExecutableSchema({
     typeDefs: schema,
@@ -23,6 +23,7 @@ const app = express();
 
 const addUser = async (req) => {
     req.user = null;
+    req.participant = null;
     try {
         const bearerLength = 'Bearer '.length;
         const { authorization } = req.headers;
@@ -31,10 +32,16 @@ const addUser = async (req) => {
             const token = authorization.slice(bearerLength);
             if (token) {
                 const decoded = await jwt.verify(token, process.env.JWT_SECRET);
-                const existingUser = await User.findByIdAndVersion(decoded.id, decoded.version);
-                req.user = existingUser;
-                if (req.user) {
-                    req.user.jwt = token;
+                if (decoded.type === 'participant') {
+                    req.participant = await Participant.findByIdAndVersion(decoded.id, decoded.version);
+                    if (req.participant) {
+                        req.participant.jwt = token;
+                    }
+                } else {
+                    req.user = await User.findByIdAndVersion(decoded.id, decoded.version);
+                    if (req.user) {
+                        req.user.jwt = token;
+                    }
                 }
             }
         }
@@ -61,6 +68,7 @@ app.use(
             schema: executableSchema,
             context: {
                 user: req.user,
+                participant: req.participant,
                 secret: process.env.JWT_SECRET
             },
             debug: process.env.ENVIRONMENT === 'dev'

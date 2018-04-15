@@ -1,19 +1,20 @@
 type Mutation {
     # Create a new group (admin only)
-    createGroup(name: String!, event: ID!, secretToken: String): Group
+    addGroup(name: String!, event: ID!, secret: String): Group
     # Create a new event (admin only)
-    createEvent(name: String!, latitude: Float, longitude: Float, radius: Float): Event
+    addEvent(name: String!, latitude: Float, longitude: Float, radius: Float): Event
     # Start the event
     #startEvent(id: ID!): Event
     # Stop the event
     #stopEvent(id: ID!): Event
 
     # Register a new user and log the user in, returns a User
-    signup(username: String!, email: String!, password: String!): User
+    signup(username: String!, password: String!): User
     # login, must be registered first, returns a User
-    login(emailOrUsername: String!, password: String!): User
+    login(username: String!, password: String!): User
+
     # Participate to the event, must be logged in, must provide the secret to be associated to a group
-    join(secretToken: String!): User
+    join(username: String!, secret: String!): Participant
     # Update the position of the logged in user
-    move(latitude: Float, longitude: Float): User
+    move(latitude: Float, longitude: Float): Participant
 }
