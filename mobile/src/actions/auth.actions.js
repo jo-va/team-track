@@ -1,9 +1,9 @@
 import { client } from '../app';
-import { LOGOUT, SET_CURRENT_USER } from '../constants/constants';
+import { LOGOUT, SET_CURRENT_PARTICIPANT } from '../constants/constants';
 
-export const setCurrentUser = user => ({
-    type: SET_CURRENT_USER,
-    user
+export const setCurrentParticipant = participant => ({
+    type: SET_CURRENT_PARTICIPANT,
+    participant
 });
 
 export const logout = () => {

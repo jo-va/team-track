@@ -96,10 +96,12 @@ const EventSchema = new mongoose.Schema({
         default: Date.now
     },
     latitude: {
-        type: Number
+        type: Number,
+        default: 0
     },
     longitude: {
-        type: Number
+        type: Number,
+        default: 0
     },
     radius: {
         type: Number,

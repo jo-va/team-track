@@ -4,11 +4,10 @@ import { View } from 'react-native';
 import { Card, Button, Text } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-
-import { logout } from '../actions/auth.actions';
-import ME_QUERY from '../graphql/me.query';
-
 import { Spinner } from '../components';
+import { logout } from '../actions/auth.actions';
+import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
+import ParticipantPropTypes from '../graphql/participant.prop-types';
 
 class Settings extends React.Component {
     static navigationOptions = {
@@ -27,15 +26,15 @@ class Settings extends React.Component {
     }
 
     render() {
-        const { loading, user } = this.props;
+        const { loading, participant } = this.props;
 
-        if (loading || !user) {
+        if (loading || !participant) {
             return <Spinner />;
         }
 
         return (
             <View style={{ paddingVertical: 20 }}>
-                <Card title={'Hello ' + user.username}>
+                <Card title={'Hello ' + participant.username}>
                     <View
                         style={{
                             backgroundColor: '#bcbec1',
@@ -48,7 +47,7 @@ class Settings extends React.Component {
                             marginBottom: 20
                         }}
                     >
-                        <Text style={{ color: 'white', fontSize: 28 }}>{user.username}</Text>
+                        <Text style={{ color: 'white', fontSize: 28 }}>{participant.username}</Text>
                     </View>
                     <Button
                         backgroundColor='#03A9F4'
@@ -71,17 +70,15 @@ Settings.propTypes = {
     navigation: PropTypes.shape({
         navigate: PropTypes.func
     }),
-    user: PropTypes.shape({
-        username: PropTypes.string
-    })
+    participant: ParticipantPropTypes
 };
 
-const meQuery = graphql(ME_QUERY, {
+const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
     skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
     options: ownProps => ({ fetchPolicy: 'cache-only' }),
-    props: ({ data: { loading, me } }) => ({
+    props: ({ data: { loading, currentParticipant } }) => ({
         loading,
-        user: me
+        participant: currentParticipant
     })
 });
 
@@ -91,5 +88,5 @@ const mapStateToProps = ({ auth }) => ({
 
 export default compose(
     connect(mapStateToProps),
-    meQuery
+    currentParticipantQuery
 )(Settings);

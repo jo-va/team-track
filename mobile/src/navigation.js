@@ -16,11 +16,11 @@ import { REHYDRATE } from 'redux-persist';
 
 import Dashboard from './screens/dashboard.screen';
 import Settings from './screens/settings.screen';
-import Signin from './screens/signin.screen';
 import Join from './screens/join.screen';
 
 import { LOGOUT } from './constants/constants';
-import ME_QUERY from './graphql/me.query';
+import CURRENT_PARTICIPANT_QUERY from './graphql/current-participant.query';
+import ParticipantPropTypes from './graphql/participant.prop-types';
 
 // tabs in main screen
 const MainScreenNavigation = TabNavigator({
@@ -37,7 +37,6 @@ const AppNavigator = StackNavigator({
             header: null
         }
     },
-    Signin: { screen: Signin },
     Join: { screen: Join }
 }, {
     mode: 'modal'
@@ -63,9 +62,9 @@ export const navigationReducer = (state = initialState, action) => {
             const { payload = { } } = action;
             if (!payload.auth || !payload.jwt) {
                 const { routes, index } = state;
-                if (routes[index].routeName !== 'Signin') {
+                if (routes[index].routeName !== 'Join') {
                     nextState = AppNavigator.router.getStateForAction(
-                        NavigationActions.navigate({ routeName: 'Signin' }),
+                        NavigationActions.navigate({ routeName: 'Join' }),
                         state
                     );
                 }
@@ -73,9 +72,9 @@ export const navigationReducer = (state = initialState, action) => {
             break;
         case LOGOUT:
             const { routes, index } = state;
-            if (routes[index].routeName !== 'Signin') {
+            if (routes[index].routeName !== 'Join') {
                 nextState = AppNavigator.router.getStateForAction(
-                    NavigationActions.navigate({ routeName: 'Signin' }),
+                    NavigationActions.navigate({ routeName: 'Join' }),
                     state
                 );
             }
@@ -116,19 +115,7 @@ AppWithNavigationState.propTypes = {
     dispatch: PropTypes.func.isRequired,
     nav: PropTypes.object.isRequired,
     refetch: PropTypes.func,
-    user: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-        distance: PropTypes.number.isRequired,
-        group: PropTypes.shape({
-            name: PropTypes.string.isRequired,
-            distance: PropTypes.number.isRequired,
-            event: PropTypes.shape({
-                name: PropTypes.string.isRequired,
-                distance: PropTypes.number.isRequired
-            })
-        })
-    })
+    participant: ParticipantPropTypes
 };
 
 const mapStateToProps = ({ auth, nav }) => ({
@@ -136,16 +123,16 @@ const mapStateToProps = ({ auth, nav }) => ({
     nav
 });
 
-const meQuery = graphql(ME_QUERY, {
+const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
     skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
-    props: ({ data: { loading, refetch, me } }) => ({
+    props: ({ data: { loading, refetch, currentParticipant } }) => ({
         loading,
         refetch,
-        user: me
+        participant: currentParticipant
     })
 });
 
 export default compose(
     connect(mapStateToProps),
-    meQuery
+    currentParticipantQuery
 )(AppWithNavigationState);

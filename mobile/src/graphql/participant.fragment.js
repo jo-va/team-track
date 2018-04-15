@@ -1,24 +1,30 @@
 import gql from 'graphql-tag';
 
-const USER_FRAGMENT = gql`
-    fragment UserFragment on User {
-        id
-        email
+const PARTICIPANT_FRAGMENT = gql`
+    fragment ParticipantFragment on Participant {
+        id        
         username
         distance
         latitude
         longitude
         state
         group {
+            id
             name
             distance
+            participants {
+                username
+            }
             event {
+                id
                 name
                 distance
+                latitude
+                longitude
                 state
             }
         }
     }
 `;
 
-export default USER_FRAGMENT;
+export default PARTICIPANT_FRAGMENT;

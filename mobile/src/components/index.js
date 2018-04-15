@@ -1,3 +1,2 @@
-export * from './Spinner';
-export * from './FormInput';
-export * from './Hr';
+export * from './spinner';
+export * from './form-input';
