@@ -7,15 +7,17 @@ import { View, Text, StyleSheet } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Button } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/SimpleLineIcons';
-import { FormInput } from '../components';
+import FormInput from '../components/form-input';
 import { setCurrentParticipant } from '../actions/auth.actions';
 import JOIN_MUTATION from '../graphql/join.mutation';
+import { applyLetterSpacing } from '../utils';
+import theme from '../theme';
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        backgroundColor: '#4a90e2',
+        backgroundColor: theme.mainColor,
         padding: 20
     },    
     headerContainer: {
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     },
     error: {
         fontSize: 15,
-        color: 'orange',
+        color: theme.errorColor,
         paddingBottom: 5,
         fontWeight: 'bold',
         textAlign: 'center'
@@ -198,12 +200,12 @@ class Join extends React.Component {
                 enableOnAndroid={true}
             >
                 <View style={styles.headerContainer}>
-                    <Icon style={styles.headerIcon} name='location-pin' color='orange' size={40} />
-                    <Text style={styles.headerTitle}>TEAM TRACKER</Text>
+                    <Icon style={styles.headerIcon} name='location-pin' color='#ffcd13' size={40} />
+                    <Text style={styles.headerTitle}>{applyLetterSpacing('TEAM TRACKER', 2)}</Text>
                     <Text style={styles.headerDescription}>Choose a username and enter your team's password to join and start the tracking</Text>
                 </View>
+                {this.state.joinErrors.map((error, i) => <Text style={styles.error} key={i}>{error}</Text>)}
                 <View style={styles.formContainer}>
-                    {this.state.joinErrors.map((error, i) => <Text style={styles.error} key={i}>{error}</Text>)}
                     <FormInput
                         refInput={input => (this.usernameInput = input)}
                         icon='user'

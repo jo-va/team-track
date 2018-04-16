@@ -1,6 +1,6 @@
 import Immutable from 'seamless-immutable';
 import { REHYDRATE } from 'redux-persist';
-import { LOGOUT, SET_CURRENT_PARTICIPANT } from '../constants/constants';
+import { LOGOUT, SET_CURRENT_PARTICIPANT } from '../actions/constants';
 
 const initialState = Immutable({
     loading: true

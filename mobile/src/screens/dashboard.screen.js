@@ -1,121 +1,17 @@
 import React from 'react';
-import {
-    ScrollView,
-    StyleSheet,
-    View,
-    Text,
-    Alert
-} from 'react-native';
-import BackgroundGeolocation from 'react-native-mauron85-background-geolocation';
-import {
-    Button,
-    Container,
-    Spinner
-} from '../components';
-
-class Dashboard extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
-    async componentDidMount() {
-        BackgroundGeolocation.configure({
-            desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-            stationaryRadius: 50,
-            distanceFilter: 10,
-            notificationTitle: 'Background tracking',
-            notificationText: 'enabled',
-            debug: true,
-            startOnBoot: false,
-            stopOnTerminate: false,
-            locationProvider: BackgroundGeolocation.RAW_PROVIDER,
-            interval: 5000,
-            fastestInterval: 5000,
-            activitiesInterval: 10000,
-            stopOnStillActivity: false,
-            url: null,//'http://192.168.0.183:3000/graphql',
-            httpHeaders: {
-                //'authorization': null
-            },
-            postTemplate: {
-                //query: 'mutation { move(latitude: @latitude, longitude: @longitude) }'
-            }
-        });
-
-        console.log('componentDidMount');
-        BackgroundGeolocation.on('location', location => {
-            console.log(location);
-            // handle your locations here
-            // to perform long running operation on iOS
-            // you need to create background task
-            BackgroundGeolocation.startTask(taskKey => {
-                // execute long running task
-                // eg. ajax post location
-                // IMPORTANT: task has to be ended by endTask
-                BackgroundGeolocation.endTask(taskKey);
-            });
-        });
-
-        BackgroundGeolocation.on('stationary', stationaryLocation => {
-            console.log(stationaryLocation);
-        });
-
-        BackgroundGeolocation.on('error', error => {
-            console.log('[ERROR] BackgroundGeolocation error:', error);
-        });
-
-        BackgroundGeolocation.on('start', () => {
-            console.log('[INFO] BackgroundGeolocation service has been started');
-        });
-
-        BackgroundGeolocation.on('stop', () => {
-            console.log('[INFO] BackgroundGeolocation service has been stopped');
-        });
-
-        BackgroundGeolocation.on('authorization', status => {
-            console.log('[INFO] BackgroundGeolocation authorization status: ' + status);
-            if (status !== BackgroundGeolocation.AUTHORIZED) {
-                Alert.alert('Location services are disabled', 'Would you like to open location settings?', [
-                    { text: 'Yes', onPress: () => BackgroundGeolocation.showLocationSettings() },
-                    { text: 'No', onPress: () => console.log('No Pressed'), style: 'cancel' }
-                ]);
-            }
-        });
-
-        BackgroundGeolocation.on('background', () => {
-            console.log('[INFO] App is in background');
-        });
-
-        BackgroundGeolocation.on('foreground', () => {
-            console.log('[INFO] App is in foreground');
-        });
-
-        BackgroundGeolocation.checkStatus(status => {
-            console.log('[INFO] BackgroundGeolocation service is running', status.isRunning);
-            console.log('[INFO] BackgroundGeolocation services enabled', status.locationServicesEnabled);
-            console.log('[INFO] BackgroundGeolocation auth status: ' + status.authorization);
-
-            // you don't need to check status before start (this is just the example)
-            if (!status.isRunning) {
-                //BackgroundGeolocation.start(); //triggers start on start event
-            }
-        });
-    }
-
-    componentWillUnmount() {
-        // unregister all event listeners
-        BackgroundGeolocation.events.forEach(event => BackgroundGeolocation.removeAllListeners(event));
-        BackgroundGeolocation.stop();
-    }
-
-    render() {
-        return (
-            <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
-                <Text>Welcome</Text>
-            </ScrollView>
-        );
-    }
-}
+import PropTypes from 'prop-types';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { Button } from 'react-native-elements';
+import { connect } from 'react-redux';
+import { graphql, compose } from 'react-apollo';
+import Spinner from '../components/spinner';
+import Distance from '../components/distance';
+import hasTracking from '../components/has-tracking';
+import { logout } from '../actions/auth.actions';
+import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
+import ParticipantPropTypes from '../graphql/participant.types';
+import { applyLetterSpacing } from '../utils';
+import theme from '../theme';
 
 const styles = StyleSheet.create({
     scroll: {
@@ -129,4 +25,99 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Dashboard;
+// See https://github.com/react-navigation/react-navigation/issues/253
+// for header centering problems
+navigationOptions = ({ navigation }) => ({
+    title: applyLetterSpacing('TEAM TRACKER'),
+    headerStyle: {
+        backgroundColor: theme.mainColor,
+        borderBottomColor: 'transparent',
+        borderWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0
+    },
+    headerTitleStyle: {
+        color: 'white',
+        fontSize: 20,
+        fontWeight: 'normal',
+        textAlign: 'center',
+        alignSelf: 'center',
+        flex: 1
+    },
+    headerTintColor: '#fff'
+});
+
+class Dashboard extends React.Component {  
+    constructor(props) {
+        super(props);
+        this.logout = this.logout.bind(this);
+    }
+
+    logout() {
+        this.props.stopTracking();
+        this.props.dispatch(logout());
+    }
+
+    render() {
+        const { loading, participant, toggleTracking } = this.props;
+
+        if (loading || !participant) {
+            return <Spinner />;
+        }
+
+        return (
+            <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
+                <Text>{participant.group.event.name}</Text>
+                <Text>{participant.group.name}</Text>
+                <Distance distance={participant.distance} />
+                <Distance distance={participant.group.distance} />
+                <Distance distance={participant.group.event.distance} />
+                <Button
+                    backgroundColor='#03A9F4'
+                    title='Enable/Disable Tracking'
+                    onPress={toggleTracking}
+                />
+                <Button
+                    backgroundColor='#03A9F4'
+                    title='Logout'
+                    onPress={this.logout}
+                />
+            </ScrollView>
+        );
+    }
+}
+
+Dashboard.propTypes = {
+    auth: PropTypes.shape({
+        loading: PropTypes.bool,
+        jwt: PropTypes.string
+    }).isRequired,
+    dispatch: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
+    navigation: PropTypes.shape({
+        navigate: PropTypes.func
+    }),
+    participant: ParticipantPropTypes
+};
+
+const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
+    skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
+    options: ownProps => ({ fetchPolicy: 'cache-only' }),
+    props: ({ data: { loading, currentParticipant } }) => ({
+        loading,
+        participant: currentParticipant
+    })
+});
+
+const mapStateToProps = ({ auth }) => ({
+    auth
+});
+
+const DashboardWithTracking = hasTracking(compose(
+    connect(mapStateToProps),
+    currentParticipantQuery
+)(Dashboard));
+
+DashboardWithTracking.navigationOptions = navigationOptions;
+
+export default DashboardWithTracking;

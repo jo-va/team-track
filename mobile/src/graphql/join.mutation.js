@@ -6,7 +6,7 @@ const JOIN_MUTATION = gql`
             id
             jwt
             username
-        } 
+        }
     }
 `;
 

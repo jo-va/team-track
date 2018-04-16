@@ -18,12 +18,12 @@ import Dashboard from './screens/dashboard.screen';
 import Settings from './screens/settings.screen';
 import Join from './screens/join.screen';
 
-import { LOGOUT } from './constants/constants';
+import { LOGOUT } from './actions/constants';
 import CURRENT_PARTICIPANT_QUERY from './graphql/current-participant.query';
-import ParticipantPropTypes from './graphql/participant.prop-types';
+import ParticipantPropTypes from './graphql/participant.types';
 
 // tabs in main screen
-const MainScreenNavigation = TabNavigator({
+const MainScreenNavigation = StackNavigator({
     Dashboard: { screen: Dashboard },
     Settings: { screen: Settings }
 }, {

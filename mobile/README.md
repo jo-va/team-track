@@ -1,6 +1,6 @@
 - yarn
 - react-native upgrade
-- Set windowSoftInputMode to adjustPan in AndroidManifest.xml.
+- Android: Set android:windowSoftInputMode="adjustPan" in AndroidManifest.xml.
 - react-native link
 - react-native run-android
 

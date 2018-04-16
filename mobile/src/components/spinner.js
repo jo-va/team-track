@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import theme from '../theme';
 
 const styles = StyleSheet.create({
     spinner: {
@@ -9,12 +10,12 @@ const styles = StyleSheet.create({
     }
 });
 
-const Spinner = ({ size }) => {
+export const Spinner = ({ size, color }) => {
     return (
         <View style={styles.spinner}>
-            <ActivityIndicator size={size || 'large'} />
+            <ActivityIndicator size={size || 'large'} color={color || theme.mainColor} />
         </View>
     );
 };
 
-export { Spinner };
+export default Spinner;

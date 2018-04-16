@@ -4,10 +4,10 @@ import { View } from 'react-native';
 import { Card, Button, Text } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
-import { Spinner } from '../components';
+import Spinner from '../components/spinner';
 import { logout } from '../actions/auth.actions';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
-import ParticipantPropTypes from '../graphql/participant.prop-types';
+import ParticipantPropTypes from '../graphql/participant.types';
 
 class Settings extends React.Component {
     static navigationOptions = {
