@@ -12,6 +12,13 @@ import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 import ParticipantPropTypes from '../graphql/participant.types';
 import { applyLetterSpacing } from '../utils';
 import theme from '../theme';
+import {
+    initTracking,
+    finalizeTracking,
+    startTracking,
+    stopTracking,
+    toggleTracking
+} from '../actions/tracking.actions';
 
 const styles = StyleSheet.create({
     scroll: {
@@ -25,41 +32,49 @@ const styles = StyleSheet.create({
     }
 });
 
-// See https://github.com/react-navigation/react-navigation/issues/253
-// for header centering problems
-navigationOptions = ({ navigation }) => ({
-    title: applyLetterSpacing('TEAM TRACKER'),
-    headerStyle: {
-        backgroundColor: theme.mainColor,
-        borderBottomColor: 'transparent',
-        borderWidth: 0,
-        elevation: 0,
-        shadowOpacity: 0
-    },
-    headerTitleStyle: {
-        color: 'white',
-        fontSize: 20,
-        fontWeight: 'normal',
-        textAlign: 'center',
-        alignSelf: 'center',
-        flex: 1
-    },
-    headerTintColor: '#fff'
-});
+class Main extends React.Component {  
+    // See https://github.com/react-navigation/react-navigation/issues/253
+    // for header centering problems
+    static navigationOptions = ({ navigation }) => ({
+        title: applyLetterSpacing('MAIN'),
+        headerStyle: {
+            backgroundColor: theme.mainColor,
+            borderBottomColor: 'transparent',
+            borderWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0
+        },
+        headerTitleStyle: {
+            color: 'white',
+            fontSize: 20,
+            fontWeight: 'normal',
+            textAlign: 'center',
+            alignSelf: 'center',
+            flex: 1
+        },
+        headerTintColor: '#fff'
+    });
 
-class Dashboard extends React.Component {  
     constructor(props) {
         super(props);
         this.logout = this.logout.bind(this);
     }
 
+    componentDidMount() {
+        this.props.dispatch(initTracking());
+    }
+
+    componentWillUnmount() {
+        finalizeTracking();
+    }
+
     logout() {
-        this.props.stopTracking();
+        stopTracking();
         this.props.dispatch(logout());
     }
 
     render() {
-        const { loading, participant, toggleTracking } = this.props;
+        const { loading, participant } = this.props;
 
         if (loading || !participant) {
             return <Spinner />;
@@ -87,7 +102,7 @@ class Dashboard extends React.Component {
     }
 }
 
-Dashboard.propTypes = {
+Main.propTypes = {
     auth: PropTypes.shape({
         loading: PropTypes.bool,
         jwt: PropTypes.string
@@ -113,11 +128,7 @@ const mapStateToProps = ({ auth }) => ({
     auth
 });
 
-const DashboardWithTracking = hasTracking(compose(
+export default compose(
     connect(mapStateToProps),
     currentParticipantQuery
-)(Dashboard));
-
-DashboardWithTracking.navigationOptions = navigationOptions;
-
-export default DashboardWithTracking;
+)(Main);

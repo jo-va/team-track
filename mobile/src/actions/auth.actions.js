@@ -9,4 +9,4 @@ export const setCurrentParticipant = participant => ({
 export const logout = () => {
     client.resetStore();
     return { type: LOGOUT };
-}
+};

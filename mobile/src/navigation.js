@@ -14,8 +14,9 @@ import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import { REHYDRATE } from 'redux-persist';
 
-import Dashboard from './screens/dashboard.screen';
-import Settings from './screens/settings.screen';
+import Main from './screens/main.screen';
+import Group from './screens/group.screen';
+import Event from './screens/event.screen';
 import Join from './screens/join.screen';
 
 import { LOGOUT } from './actions/constants';
@@ -23,11 +24,12 @@ import CURRENT_PARTICIPANT_QUERY from './graphql/current-participant.query';
 import ParticipantPropTypes from './graphql/participant.types';
 
 // tabs in main screen
-const MainScreenNavigation = StackNavigator({
-    Dashboard: { screen: Dashboard },
-    Settings: { screen: Settings }
+const MainScreenNavigation = TabNavigator({
+    Main: { screen: Main },
+    Group: { screen: Group },
+    Event: { screen: Event }
 }, {
-    initialRouteName: 'Dashboard'
+    initialRouteName: 'Main'
 });
 
 const AppNavigator = StackNavigator({
