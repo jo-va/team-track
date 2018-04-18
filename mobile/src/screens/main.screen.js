@@ -16,7 +16,6 @@ import {
 } from 'native-base';
 import { View, StyleSheet } from 'react-native';
 import { Grid, Row } from 'react-native-easy-grid';
-import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import Spinner from '../components/spinner';
@@ -32,14 +31,6 @@ import {
     stopTracking,
     toggleTracking
 } from '../actions/tracking.actions';
-import AubergineStyle from './mapStyles/aubergine.json';
-import StandardStyle from './mapStyles/standard.json';
-
-const styles = StyleSheet.create({
-    map: {
-        ...StyleSheet.absoluteFillObject
-    }
-});
 
 class Main extends React.Component {  
     constructor(props) {
@@ -99,22 +90,7 @@ class Main extends React.Component {
                         <Distance distance={participant.distance} />
                         <Distance distance={participant.group.distance} />
                         <Distance distance={participant.group.event.distance} />
-                    </Row>
-                    <Row size={6}>
-                        <MapView
-                            ref='map'
-                            customMapStyle={StandardStyle}
-                            provider={PROVIDER_GOOGLE}
-                            style={styles.map}
-                            region={this.state.region}
-                            showsMyLocationButton={false}
-                            showsPointsOfInterest={false}
-                            showsScale={false}
-                            showsTraffic={false}
-                            showsCompass={false}
-                            toolbarEnabled={false}
-                        />
-                    </Row>                    
+                    </Row>                 
                     <Row size={1}>
                         <Button onPress={toggleTracking}>
                             <Text>Tracking</Text>
