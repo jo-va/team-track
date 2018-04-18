@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Button, Text, Icon, Footer, FooterTab } from "native-base";
 import {
     NavigationActions,
     addNavigationHelpers,
@@ -29,7 +30,37 @@ const MainScreenNavigation = TabNavigator({
     Group: { screen: Group },
     Event: { screen: Event }
 }, {
-    initialRouteName: 'Main'
+    initialRouteName: 'Main',
+    tabBarPosition: 'bottom',
+    tabBarComponent: props => {
+        return (
+            <Footer>
+                <FooterTab>
+                    <Button
+                        vertical
+                        active={props.navigationState.index === 0}
+                        onPress={() => props.navigation.navigate('Main')}>
+                        <Icon name='md-stopwatch' />
+                        <Text>Distance</Text>
+                    </Button>
+                    <Button
+                        vertical
+                        active={props.navigationState.index === 1}
+                        onPress={() => props.navigation.navigate('Group')}>
+                        <Icon name='body' />
+                        <Text>Team</Text>
+                    </Button>
+                    <Button
+                        vertical
+                        active={props.navigationState.index === 2}
+                        onPress={() => props.navigation.navigate('Event')}>
+                        <Icon name='flag' />
+                        <Text>Event</Text>
+                    </Button>   
+                </FooterTab>
+            </Footer>                                     
+        );
+    }
 });
 
 const AppNavigator = StackNavigator({

@@ -1,7 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
+import {
+    Container,
+    Content,
+    Header,
+    Title,
+    Button,
+    Icon,
+    Right,
+    Left,
+    Body,
+    Text,
+    Fab,
+    IconNB
+} from 'native-base';
+import { View, StyleSheet } from 'react-native';
+import { Grid, Row } from 'react-native-easy-grid';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import Spinner from '../components/spinner';
@@ -10,8 +25,6 @@ import hasTracking from '../components/has-tracking';
 import { logout } from '../actions/auth.actions';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 import ParticipantPropTypes from '../graphql/participant.types';
-import { applyLetterSpacing } from '../utils';
-import theme from '../theme';
 import {
     initTracking,
     finalizeTracking,
@@ -19,44 +32,29 @@ import {
     stopTracking,
     toggleTracking
 } from '../actions/tracking.actions';
+import AubergineStyle from './mapStyles/aubergine.json';
+import StandardStyle from './mapStyles/standard.json';
 
 const styles = StyleSheet.create({
-    scroll: {
-        padding: 30,
-        flexDirection: 'column'
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
+    map: {
+        ...StyleSheet.absoluteFillObject
     }
 });
 
 class Main extends React.Component {  
-    // See https://github.com/react-navigation/react-navigation/issues/253
-    // for header centering problems
-    static navigationOptions = ({ navigation }) => ({
-        title: applyLetterSpacing('MAIN'),
-        headerStyle: {
-            backgroundColor: theme.mainColor,
-            borderBottomColor: 'transparent',
-            borderWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0
-        },
-        headerTitleStyle: {
-            color: 'white',
-            fontSize: 20,
-            fontWeight: 'normal',
-            textAlign: 'center',
-            alignSelf: 'center',
-            flex: 1
-        },
-        headerTintColor: '#fff'
-    });
-
     constructor(props) {
         super(props);
+
+        this.state = {
+            menuFab: false,
+            region: {
+                latitude: 45.39745520000535,
+                longitude: -71.91719054925784,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            }
+        }
+
         this.logout = this.logout.bind(this);
     }
 
@@ -77,27 +75,68 @@ class Main extends React.Component {
         const { loading, participant } = this.props;
 
         if (loading || !participant) {
-            return <Spinner />;
+            return (
+                <Container>
+                    <Spinner />
+                </Container>
+            );
         }
 
+        /*
+        <Header>
+            <Left style={{ flex: 1 }} />
+            <Body style={{ flex: 1 }}>
+                <Title>Dashboard</Title>
+            </Body>
+            <Right style={{ flex: 1 }} />
+        </Header>
+        */
+
         return (
-            <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
-                <Text>{participant.group.event.name}</Text>
-                <Text>{participant.group.name}</Text>
-                <Distance distance={participant.distance} />
-                <Distance distance={participant.group.distance} />
-                <Distance distance={participant.group.event.distance} />
-                <Button
-                    backgroundColor='#03A9F4'
-                    title='Enable/Disable Tracking'
-                    onPress={toggleTracking}
-                />
-                <Button
-                    backgroundColor='#03A9F4'
-                    title='Logout'
-                    onPress={this.logout}
-                />
-            </ScrollView>
+            <Container>
+                 <Grid>
+                    <Row size={1}>
+                        <Distance distance={participant.distance} />
+                        <Distance distance={participant.group.distance} />
+                        <Distance distance={participant.group.event.distance} />
+                    </Row>
+                    <Row size={6}>
+                        <MapView
+                            ref='map'
+                            customMapStyle={StandardStyle}
+                            provider={PROVIDER_GOOGLE}
+                            style={styles.map}
+                            region={this.state.region}
+                            showsMyLocationButton={false}
+                            showsPointsOfInterest={false}
+                            showsScale={false}
+                            showsTraffic={false}
+                            showsCompass={false}
+                            toolbarEnabled={false}
+                        />
+                    </Row>                    
+                    <Row size={1}>
+                        <Button onPress={toggleTracking}>
+                            <Text>Tracking</Text>
+                        </Button>
+                    </Row>
+                    <View style={{ flex: 1 }}>
+                        <Fab
+                            active={this.state.menuFab}
+                            direction='up'
+                            position='bottomRight'
+                            containerStyle={{}}
+                            style={{ backgroundColor: '#5067ff' }}
+                            onPress={() => this.setState({ menuFab: !this.state.menuFab })}
+                        >
+                            <IconNB name="md-menu" />
+                            <Button style={{ backgroundColor: '#DD5144' }} onPress={this.logout}>
+                                <IconNB name="md-log-out" />
+                            </Button>
+                        </Fab>
+                    </View>
+                </Grid>
+            </Container>
         );
     }
 }
@@ -124,8 +163,9 @@ const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
     })
 });
 
-const mapStateToProps = ({ auth }) => ({
-    auth
+const mapStateToProps = ({ auth, tracking }) => ({
+    auth,
+    tracking
 });
 
 export default compose(

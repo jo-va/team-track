@@ -1,4 +1,5 @@
 import React from 'react';
+import { Root } from "native-base";
 import { AsyncStorage } from 'react-native';
 import { ApolloClient } from 'apollo-client';
 import { ApolloLink } from 'apollo-link';
@@ -37,7 +38,7 @@ const reducer = persistCombineReducers(config, {
     auth
 });
 
-export const store = createStore(
+const store = createStore(
     reducer,
     {}, // initial state
     composeWithDevTools(
@@ -106,13 +107,15 @@ export const client = new ApolloClient({
 export default class App extends React.Component {
     render() {
         return (
-            <ApolloProvider client={client}>
-                <Provider store={store}>
-                    <PersistGate persistor={persistor}>
-                        <AppWithNavigationState />
-                    </PersistGate>
-                </Provider>
-            </ApolloProvider>
+            <Root>
+                <ApolloProvider client={client}>
+                    <Provider store={store}>
+                        <PersistGate persistor={persistor}>
+                            <AppWithNavigationState />
+                        </PersistGate>
+                    </Provider>
+                </ApolloProvider>
+            </Root>
         );
     }
 }

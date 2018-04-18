@@ -1,4 +1,5 @@
 import BackgroundGeolocation from 'react-native-mauron85-background-geolocation';
+import { Alert } from 'react-native';
 import { store } from '../app';
 import {
     START_TRACKING,
@@ -12,8 +13,8 @@ import {
 } from './constants';
 
 const defaultConfig = {
-    desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-    stationaryRadius: 10,
+    desiredAccuracy: 0,
+    stationaryRadius: 5,
     distanceFilter: 10,
     notificationTitle: 'Team Tracker',
     notificationText: 'Background tracking enabled',
