@@ -1,7 +1,31 @@
-import socket from '../socket';
+import { withFilter } from 'graphql-subscriptions';
+import pubsub from '../pubsub';
+
+export const PARTICIPANT_JOINED = 'participantJoined';
+export const GROUP_DISTANCE_UPDATED = 'groupDistanceUpdated';
+
+export const subscriptionLogic = {
+    async participantJoined(baseParams, args, ctx) {
+        if (!ctx || !ctx.participant || !ctx.participant.group) {
+            throw new Error('Unauthorized');
+        }
+        console.log(baseParams, args, ctx);
+        baseParams.context = ctx;
+        return baseParams;
+    }
+};
 
 export const Subscription = {
-    userJoinedGroup: {
-        subscribe: () => socket.asyncIterator('USER_JOINED_GROUP')
+    participantJoined: {
+        subscribe: withFilter(
+            () => pubsub.asyncIterator(PARTICIPANT_JOINED),
+            (payload, args, ctx) => {
+                console.log(payload, args, ctx);
+                return Boolean(payload.participantJoined.group == ctx.participant.group);
+            }
+        )
+    },
+    groupDistanceUpdated: {
+        subscribe: () => pubsub.asyncIterator(GROUP_DISTANCE_UPDATED)
     }
 };

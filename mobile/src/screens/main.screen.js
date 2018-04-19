@@ -109,6 +109,9 @@ class Main extends React.Component {
                             <Button style={{ backgroundColor: '#DD5144' }} onPress={this.logout}>
                                 <IconNB name="md-log-out" />
                             </Button>
+                            <Button style={{ backgroundColor: 'green' }} onPress={toggleTracking}>
+                                <IconNB name="md-pin" />
+                            </Button>
                         </Fab>
                     </View>
                 </Grid>

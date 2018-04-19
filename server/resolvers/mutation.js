@@ -1,7 +1,8 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, Participant, Group, Event } from '../models';
-// import socket from '../socket';
+import pubsub from '../pubsub';
+import { PARTICIPANT_JOINED } from './subscription';
 import { mustBeAdmin, mustBeAuthenticated } from './security';
 
 export const Mutation = {
@@ -60,7 +61,6 @@ export const Mutation = {
     },
 
     join: async (root, { username, secret }, ctx) => {
-        // socket.publish('USER_JOINED_GROUP', { userJoinedGroup: user });
         const participant = await Participant.add(username, secret);
 
         participant.jwt = jwt.sign(
@@ -74,6 +74,8 @@ export const Mutation = {
         );
 
         ctx.participant = participant;
+
+        pubsub.publish(PARTICIPANT_JOINED, { [PARTICIPANT_JOINED]: participant });
 
         return participant;
     },

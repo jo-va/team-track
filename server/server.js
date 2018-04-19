@@ -7,91 +7,83 @@ import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { subscribe, execute } from 'graphql';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import jwt from 'jsonwebtoken';
+import jwt from 'express-jwt';
+import jsonwebtoken from 'jsonwebtoken';
 import morgan from 'morgan';
 
 import schema from './schema';
 import resolvers from './resolvers';
 import { User, Participant } from './models';
+import { getSubscriptionDetails } from './pubsub';
+import { subscriptionLogic } from './resolvers/subscription';
+
+const GRAPHQL_PORT = process.env.PORT;
+const GRAPHQL_PATH = '/graphql';
+const SUBSCRIPTIONS_PATH = '/subscriptions';
 
 const executableSchema = makeExecutableSchema({
     typeDefs: schema,
     resolvers
 });
 
+const getUserOrParticipant = async (decoded) => ({
+    user: decoded && decoded.type === 'user' ?
+        await User.findByIdAndVersion(decoded.id, decoded.version) : null,
+    participant: decoded && decoded.type === 'participant' ?
+        await Participant.findByIdAndVersion(decoded.id, decoded.version) : null,
+});
+
 const app = express();
 
-const addUser = async (req) => {
-    req.user = null;
-    req.participant = null;
-    try {
-        const bearerLength = 'Bearer '.length;
-        const { authorization } = req.headers;
-
-        if (authorization && authorization.length > bearerLength) {
-            const token = authorization.slice(bearerLength);
-            if (token) {
-                const decoded = await jwt.verify(token, process.env.JWT_SECRET);
-                if (decoded.type === 'participant') {
-                    req.participant = await Participant.findByIdAndVersion(decoded.id, decoded.version);
-                    if (req.participant) {
-                        req.participant.jwt = token;
-                    }
-                } else {
-                    req.user = await User.findByIdAndVersion(decoded.id, decoded.version);
-                    if (req.user) {
-                        req.user.jwt = token;
-                    }
-                }
-            }
-        }
-    } catch (err) {
-        console.log('JWT error: ', err.message);
-    }
-    req.next();
-};
-
 app.use(morgan(':date[iso] - :remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms'));
+
 app.use(cors('*'));
-app.use(addUser);
+
+app.use('/graphql', bodyParser.json(), jwt({
+    secret: process.env.JWT_SECRET,
+    credentialsRequired: false
+}), graphqlExpress(async (req) => ({
+    schema: executableSchema,
+    context: {
+        ...await getUserOrParticipant(req.user),
+        secret: process.env.JWT_SECRET
+    },
+    debug: process.env.ENVIRONMENT === 'dev'
+})));
 
 app.use('/graphiql', graphiqlExpress({
-    endpointURL: '/graphql',
-    subscriptionsEndpoint: `ws://localhost:${process.env.PORT}/subscriptions`
+    endpointURL: GRAPHQL_PATH,
+    subscriptionsEndpoint: `ws://localhost:${GRAPHQL_PORT}${SUBSCRIPTIONS_PATH}`
 }));
 
-app.use(
-    '/graphql',
-    bodyParser.json(),
-    graphqlExpress((req) => {
-        return {
-            schema: executableSchema,
-            context: {
-                user: req.user,
-                participant: req.participant,
-                secret: process.env.JWT_SECRET
-            },
-            debug: process.env.ENVIRONMENT === 'dev'
-        };
-    })
-);
+const graphQLServer = createServer(app);
 
-const server = createServer(app);
+graphQLServer.listen(GRAPHQL_PORT, () => {
+    console.log(`> GraphQL Server is now running on http://localhost:${GRAPHQL_PORT}${GRAPHQL_PATH}`);
+    console.log(`> GraphQL Subscriptions are now running on ws://localhost:${GRAPHQL_PORT}${SUBSCRIPTIONS_PATH}`);
+});
 
-server.listen(process.env.PORT, (err) => {
-    if (err) {
-        throw err;
+const subscriptionServer = SubscriptionServer.create({
+    schema: executableSchema,
+    execute,
+    subscribe,
+    onConnect: async (connectionParams, webSocket) => {
+        console.log(connectionParams);
+        if (connectionParams.jwt) {
+            const decoded = await jsonwebtoken.verify(connectionParams.jwt, process.env.JWT_SECRET);
+            return getUserOrParticipant(decoded);
+        }
+        console.log('Client connected');
+    },
+    onOperation: async (parsedMessage, baseParams) => {
+        const { subscriptionName, args } = getSubscriptionDetails({
+            baseParams,
+            schema: executableSchema
+        });
+
+        return subscriptionLogic[subscriptionName](baseParams, args, baseParams.context);
     }
-
-    SubscriptionServer.create({
-        schema: executableSchema,
-        execute,
-        subscribe,
-        onConnect: () => console.log('Client connected')
-    }, {
-        server,
-        path: '/subscriptions'
-    });
-
-    console.log(`> Server ready on http://localhost:${process.env.PORT}/graphql`);
+}, {
+    server: graphQLServer,
+    path: SUBSCRIPTIONS_PATH
 });
