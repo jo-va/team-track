@@ -1,6 +1,7 @@
 import { Types } from 'mongoose';
 import * as db from '../connectors';
 import { Group } from './group';
+import { Event } from './event';
 import { calculateDistance } from './distance';
 
 const findAll = () => {
@@ -41,6 +42,9 @@ const add = async (username, secret) => {
     return db.Participant.create(participant);
 };
 
+// Updates the participant's position and distance
+// If the position is valid, the group's distance will be updated as well,
+// Returns the updated participant and group
 const move = async (id, latitude, longitude) => {
     const participant = await db.Participant.findById(id).populate('event').exec();
     if (!participant) {
@@ -64,13 +68,18 @@ const move = async (id, latitude, longitude) => {
     }
 
     // Calculate new distance
-    const inc = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
-    const distance = participant.distance + inc;
+    const increment = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
+    const distance = participant.distance + increment;
 
-    // Update the group's distance
-    if (distance != 0) {
-        db.Group.findByIdAndUpdate(participant.group, { $inc: { increment: inc, distance: inc } }).exec();
-        // Send group notif
+    if (increment > 0) {
+        const updatedGroup = db.Group.findByIdAndUpdate(participant.group, {
+            $inc: {
+                eventDistanceIncrement: increment,
+                distance: increment
+            }
+        }, { new: true }).exec();
+
+        Group.onDistanceUpdated(await updatedGroup);
     }
 
     return db.Participant.findByIdAndUpdate(id, {
@@ -94,21 +103,21 @@ export const Participant = {
 
 // Change stream event handler listening to group distance changes triggered by Participant.move()
 db.MongoDBConnection.then(mongodb => {
-    const distance_threshold = 1;
+    const distance_increment_threshold = 5;
 
     const pipeline = [{
-        $match: { 'fullDocument.increment': { $gte: distance_threshold } }
+        $match: { 'fullDocument.eventDistanceIncrement': { $gte: distance_increment_threshold } }
     }];
 
     mongodb.collection('groups').watch(pipeline, {
         fullDocument: 'updateLookup'
-    }).on('change', data => {
-        const increment = data.fullDocument.increment;
-        console.log(`event distance by +${increment}`);
+    }).on('change', async (data) => {
+        const increment = data.fullDocument.eventDistanceIncrement;
+        console.log(`event distance +${increment}`);
 
-        db.Group.findByIdAndUpdate(data.fullDocument._id, { $set: { increment: 0 } }).exec();
-        db.Event.findByIdAndUpdate(data.fullDocument.event, { $inc: { distance: increment } }).exec();
+        db.Group.findByIdAndUpdate(data.fullDocument._id, { $set: { eventDistanceIncrement: 0 } }).exec();
+        const event = db.Event.findByIdAndUpdate(data.fullDocument.event, { $inc: { distance: increment } }, { new: true }).exec();
 
-        // Send event notif
+        Event.onDistanceUpdated(await event);
     });
 });

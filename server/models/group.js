@@ -56,10 +56,24 @@ const add = async (group) => {
     return db.Group.create(group);
 };
 
+let distanceHandler = null;
+
+const registerDistanceUpdatedHandler = handler => {
+    distanceHandler = handler;
+};
+
+const onDistanceUpdated = group => {
+    if (distanceHandler) {
+        distanceHandler(group);
+    }
+};
+
 export const Group = {
     findAllByEventId,
     findById,
     findAll,
     findBySecret,
-    add
+    add,
+    onDistanceUpdated,
+    registerDistanceUpdatedHandler
 };

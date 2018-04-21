@@ -1,4 +1,5 @@
 type Subscription {
-    participantJoined: Participant
-    groupDistanceUpdated: Group
+    participantJoined(group: ID!): Participant
+    groupDistanceUpdated(group: ID!): Group
+    eventDistanceUpdated(event: ID!): Event
 }

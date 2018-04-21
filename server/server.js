@@ -67,7 +67,7 @@ const subscriptionServer = SubscriptionServer.create({
     schema: executableSchema,
     execute,
     subscribe,
-    onConnect: async (connectionParams, webSocket) => {
+    /*onConnect: async (connectionParams, webSocket) => {
         console.log(connectionParams);
         if (connectionParams.jwt) {
             const decoded = await jsonwebtoken.verify(connectionParams.jwt, process.env.JWT_SECRET);
@@ -81,7 +81,7 @@ const subscriptionServer = SubscriptionServer.create({
         });
 
         return subscriptionLogic[subscriptionName](baseParams, args, baseParams.context);
-    }
+    }*/
 }, {
     server: graphQLServer,
     path: SUBSCRIPTIONS_PATH

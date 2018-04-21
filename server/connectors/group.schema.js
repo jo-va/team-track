@@ -19,7 +19,7 @@ const groupSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
-    increment: {
+    eventDistanceIncrement: {
         type: Number,
         default: 0,
         min: 0

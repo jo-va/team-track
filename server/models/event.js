@@ -19,9 +19,23 @@ const add = (event) => {
     return db.create(event);
 };
 
+let distanceHandler = null;
+
+const registerDistanceUpdatedHandler = handler => {
+    distanceHandler = handler;
+};
+
+const onDistanceUpdated = event => {
+    if (distanceHandler) {
+        distanceHandler(event);
+    }
+};
+
 export const Event = {
     findAll,
     findById,
     findAllById,
-    add
+    add,
+    onDistanceUpdated,
+    registerDistanceUpdatedHandler
 };
