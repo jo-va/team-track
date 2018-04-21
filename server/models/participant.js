@@ -91,3 +91,24 @@ export const Participant = {
     add,
     move
 };
+
+// Change stream event handler listening to group distance changes triggered by Participant.move()
+db.MongoDBConnection.then(mongodb => {
+    const distance_threshold = 1;
+
+    const pipeline = [{
+        $match: { 'fullDocument.increment': { $gte: distance_threshold } }
+    }];
+
+    mongodb.collection('groups').watch(pipeline, {
+        fullDocument: 'updateLookup'
+    }).on('change', data => {
+        const increment = data.fullDocument.increment;
+        console.log(`event distance by +${increment}`);
+
+        db.Group.findByIdAndUpdate(data.fullDocument._id, { $set: { increment: 0 } }).exec();
+        db.Event.findByIdAndUpdate(data.fullDocument.event, { $inc: { distance: increment } }).exec();
+
+        // Send event notif
+    });
+});
