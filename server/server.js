@@ -73,7 +73,6 @@ const subscriptionServer = SubscriptionServer.create({
             const decoded = await jsonwebtoken.verify(connectionParams.jwt, process.env.JWT_SECRET);
             return getUserOrParticipant(decoded);
         }
-        console.log('Client connected');
     },
     onOperation: async (parsedMessage, baseParams) => {
         const { subscriptionName, args } = getSubscriptionDetails({

@@ -64,12 +64,13 @@ const move = async (id, latitude, longitude) => {
     }
 
     // Calculate new distance
-    const dt = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
-    const distance = participant.distance + dt;
+    const inc = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
+    const distance = participant.distance + inc;
 
-    // Push the distance travelled to the group's queue.
+    // Update the group's distance
     if (distance != 0) {
-        db.Group.findByIdAndUpdate(participant.group, { $push: { increments: dt } }).exec();
+        db.Group.findByIdAndUpdate(participant.group, { $inc: { increment: inc, distance: inc } }).exec();
+        // Send group notif
     }
 
     return db.Participant.findByIdAndUpdate(id, {

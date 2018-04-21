@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import mongodb from 'mongodb';
 import uniqueValidator from 'mongoose-unique-validator';
 import crypto from 'crypto';
 
@@ -84,16 +85,16 @@ const groupSchema = new mongoose.Schema({
         default: 0,
         min: 0
     },
+    increment: {
+        type: Number,
+        default: 0,
+        min: 0
+    },    
     secret: {
         type: String,
         default: generateSecret,
         unique: true
-    },
-    increments: [{
-        type: Number,
-        default: 0,
-        min: 0
-    }]
+    }
 });
 
 const eventSchema = new mongoose.Schema({
@@ -128,12 +129,7 @@ const eventSchema = new mongoose.Schema({
         type: String,
         default: 'inactive',
         enum: ['active', 'inactive']
-    },
-    increments: [{
-        type: Number,
-        default: 0,
-        min: 0
-    }]
+    }
 });
 
 userSchema.plugin(uniqueValidator);
@@ -144,14 +140,31 @@ export const Group = mongoose.model('Group', groupSchema);
 export const Event = mongoose.model('Event', eventSchema);
 
 console.log(`Connecting to ${process.env.DATABASE_URL}`)
-export const MongooseConnection = mongoose.connect(process.env.DATABASE_URL, {
-        socketTimeoutMS: 0,
-        keepAlive: true,
-        reconnectTries: 30
-    })
+export const MongooseConnection = mongoose.connect(process.env.DATABASE_URL)
     .then(client => {
         console.log('> Connected to database');
     })
     .catch((connectError) => {
         console.error('Could not connect to MongoDB', connectError);
     });
+
+mongodb.MongoClient.connect(process.env.DATABASE_URL).then(client => {
+    const db = client.db('tracker');
+
+    const distance_threshold = 1;
+    const pipeline = [{
+        $match: { 'fullDocument.increment': { $gte: distance_threshold } }
+    }];
+
+    db.collection('groups').watch(pipeline, {
+        fullDocument: 'updateLookup'
+    }).on('change', data => {
+        const increment = data.fullDocument.increment;
+        console.log(`Incr. event distance by +${increment}`)
+
+        Group.findByIdAndUpdate(data.fullDocument._id, { $set: { increment: 0 } }).exec();
+        Event.findByIdAndUpdate(data.fullDocument.event, { $inc: { distance: increment } }).exec();
+
+        // Send event notif
+    });
+});
