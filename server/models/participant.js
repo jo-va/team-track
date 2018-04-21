@@ -31,7 +31,7 @@ const add = async (username, secret) => {
         throw new Error('No group found');
     }
 
-    const participant = { username: username.trim(), group: group._id };
+    const participant = { username: username.trim(), group: group._id, event: group.event };
 
     // The username shall be unique within the group
     const foundParticipant = await db.Participant.findOne(participant).exec();
@@ -42,11 +42,11 @@ const add = async (username, secret) => {
 };
 
 const move = async (id, latitude, longitude) => {
-    const participant = await db.Participant.findById(id).populate('group', 'event').exec();
+    const participant = await db.Participant.findById(id).populate('event').exec();
     if (!participant) {
         throw new Error('You must join a group');
     }
-    const event = await db.Event.findById(participant.group.event).exec();
+    const event = participant.event;
     if (!event) {
         throw new Error('No event found');
     }
@@ -54,31 +54,32 @@ const move = async (id, latitude, longitude) => {
     // make sure the participant is within the allowed event perimeter
     const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
     if (dist2center > event.radius) {
-        return db.Participant.findByIdAndUpdate(participant._id, { $set: { state: 'inactive' } }).exec();
+        return db.Participant.findByIdAndUpdate(id, { $set: { state: 'inactive' } }, { new: true }).exec();
     }
 
     // If we just entered the perimeter, don't update the distance since the last point was outside,
     // update the state only
     if (participant.state === 'inactive') {
-        return db.Participant.findByIdAndUpdate(participant._id, { $set: { state: 'active' } }).exec();
+        return db.Participant.findByIdAndUpdate(id, { $set: { state: 'active' } }, { new: true }).exec();
     }
 
     // Calculate new distance
     const dt = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
     const distance = participant.distance + dt;
 
-    // Increment group and event distance
-    await db.Group.findByIdAndUpdate(participant.group._id, { $inc: { distance: dt } }).exec();
-    await db.Event.findByIdAndUpdate(event._id, { $inc: { distance: dt } }).exec();
+    // Push the distance travelled to the group's queue.
+    if (distance != 0) {
+        db.Group.findByIdAndUpdate(participant.group, { $push: { increments: dt } }).exec();
+    }
 
-    return db.Participant.findByIdAndUpdate(participant._id, {
+    return db.Participant.findByIdAndUpdate(id, {
         $set: {
             state: 'active',
             longitude,
             latitude,
             distance
         }
-    }).exec();
+    }, { new: true }).exec();
 };
 
 export const Participant = {

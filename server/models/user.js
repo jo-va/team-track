@@ -17,6 +17,10 @@ const findByUsername = (username) => {
     return db.User.findOne({ username }).exec();
 };
 
+const addEvent = (userId, eventId) => {
+    return db.User.findByIdAndUpdate(userId, { $push: { events: eventId } }, { new: true });
+}
+
 const add = async (user) => {
     // The username must be specified
     if (!user.username || !user.username.trim()) {
@@ -38,5 +42,6 @@ export const User = {
     findById,
     findByIdAndVersion,
     findByUsername,
+    addEvent,
     add
 };

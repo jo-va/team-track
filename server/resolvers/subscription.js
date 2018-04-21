@@ -26,6 +26,12 @@ export const Subscription = {
         )
     },
     groupDistanceUpdated: {
-        subscribe: () => pubsub.asyncIterator(GROUP_DISTANCE_UPDATED)
+        subscribe: withFilter(
+            () => pubsub.asyncIterator(GROUP_DISTANCE_UPDATED),
+            (payload, args, ctx) => {
+                console.log(payload, args, ctx);
+                return Boolean(payload.groupDistanceUpdated.id == ctx.participant.group);
+            }
+        )
     }
 };

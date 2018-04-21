@@ -2,14 +2,11 @@ type Query {
     currentUser: User
     currentParticipant: Participant
 
-    user(id: ID!): User
-    users: [User]
-
     participant(id: ID!): Participant
-    participants: [Participant]
+    participants(event: ID!): [Participant]
 
     group(id: ID!): Group
-    groups: [Group]
+    groups(event: ID!): [Group]
 
     event(id: ID!): Event
     events: [Event]

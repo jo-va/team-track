@@ -11,13 +11,13 @@ export const mustBeOwner = (ctx, caller, owner) => {
 };
 
 export const mustBeAdmin = (ctx) => {
-    if (!ctx || !ctx.user || !ctx.user.isAdmin) {
+    if (!ctx || !ctx.user) {
         throw new Error('Unauthorized');
     }
 };
 
 export const mustBeOwnerOrAdmin = (ctx, caller, owner) => {
-    if (ctx && ctx.user && ctx.user.isAdmin) {
+    if (ctx && ctx.user) {
         return;
     }
     if (!ctx || !caller || caller.id !== owner.id) {

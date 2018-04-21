@@ -3,17 +3,22 @@ import jwt from 'jsonwebtoken';
 import { User, Participant, Group, Event } from '../models';
 import pubsub from '../pubsub';
 import { PARTICIPANT_JOINED } from './subscription';
-import { mustBeAdmin, mustBeAuthenticated } from './security';
+import { mustBeAuthenticated } from './security';
 
 export const Mutation = {
     addGroup: async (root, group, ctx) => {
-        mustBeAdmin(ctx);
-        return Group.add(group);
+        mustBeAuthenticated(ctx, ctx.user);
+        if (!ctx.user.events || ctx.user.events.length === 0 || !(ctx.user.events.indexOf(group.event) > -1)) {
+            throw new Error('Unauthorized');
+        }
+        return Group.add(group, ctx.user.id);
     },
 
     addEvent: async (root, event, ctx) => {
-        mustBeAdmin(ctx);
-        return Event.add(event);
+        mustBeAuthenticated(ctx, ctx.user);
+        const newEvent = await Event.add(event, ctx.user.id);
+        ctx.user = await User.addEvent(ctx.user.id, newEvent.id);
+        return newEvent;
     },
 
     signup: async (root, { username, password }, ctx) => {

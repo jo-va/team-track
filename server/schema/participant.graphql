@@ -2,8 +2,9 @@ type Participant {
     id: ID!,
     username: String!
     jwt: String!
-    group: Group
-    distance: Float	
+    group: Group!
+    event: Event!
+    distance: Float
     latitude: Float
     longitude: Float
     state: String

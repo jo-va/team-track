@@ -37,14 +37,8 @@ class Main extends React.Component {
         super(props);
 
         this.state = {
-            menuFab: false,
-            region: {
-                latitude: 45.39745520000535,
-                longitude: -71.91719054925784,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-            }
-        }
+            menuFab: false
+        };
 
         this.logout = this.logout.bind(this);
     }

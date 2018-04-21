@@ -1,9 +1,12 @@
-import { Group } from '../models';
+import { Group, Event } from '../models';
 import { mustBeOwner, mustBeOwnerOrAdmin } from './security';
 
 export const Participant = {
     group: (participant) => {
         return Group.findById(participant.group);
+    },
+    event: (participant) => {
+        return Event.findById(participant.event);
     },
     jwt: (participant, args, ctx) => {
         mustBeOwner(ctx, ctx.participant, participant);
@@ -11,18 +14,18 @@ export const Participant = {
     },
     distance: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return ctx.participant.distance;
+        return participant.distance;
     },
     latitude: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return ctx.participant.latitude;
+        return participant.latitude;
     },
     longitude: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return ctx.participant.longitude;
+        return participant.longitude;
     },
     state: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return ctx.participant.state;
+        return participant.state;
     }
 };

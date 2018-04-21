@@ -6,7 +6,7 @@ mongoose.Promise = global.Promise;
 
 const generateSecret = () => crypto.randomBytes(4).toString('hex');
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -17,17 +17,18 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    isAdmin: {
-        type: Boolean,
-        default: false
-    },
     version: {
         type: Number,
         default: 1
-    }
+    },
+    events: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+        default: null
+    }]
 });
 
-const ParticipantSchema = new mongoose.Schema({
+const participantSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -36,6 +37,11 @@ const ParticipantSchema = new mongoose.Schema({
     group: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Group',
+        default: null
+    },
+    event: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
         default: null
     },
     distance: {
@@ -62,7 +68,7 @@ const ParticipantSchema = new mongoose.Schema({
     }
 });
 
-const GroupSchema = new mongoose.Schema({
+const groupSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -82,10 +88,15 @@ const GroupSchema = new mongoose.Schema({
         type: String,
         default: generateSecret,
         unique: true
-    }
+    },
+    increments: [{
+        type: Number,
+        default: 0,
+        min: 0
+    }]
 });
 
-const EventSchema = new mongoose.Schema({
+const eventSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -117,18 +128,30 @@ const EventSchema = new mongoose.Schema({
         type: String,
         default: 'inactive',
         enum: ['active', 'inactive']
-    }
+    },
+    increments: [{
+        type: Number,
+        default: 0,
+        min: 0
+    }]
 });
 
-UserSchema.plugin(uniqueValidator);
-GroupSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator);
 
-export const User = mongoose.model('User', UserSchema);
-export const Participant = mongoose.model('Participant', ParticipantSchema);
-export const Group = mongoose.model('Group', GroupSchema);
-export const Event = mongoose.model('Event', EventSchema);
+export const User = mongoose.model('User', userSchema);
+export const Participant = mongoose.model('Participant', participantSchema);
+export const Group = mongoose.model('Group', groupSchema);
+export const Event = mongoose.model('Event', eventSchema);
 
-export const MongooseConnection = mongoose.connect(process.env.DATABASE_URL)
+console.log(`Connecting to ${process.env.DATABASE_URL}`)
+export const MongooseConnection = mongoose.connect(process.env.DATABASE_URL, {
+        socketTimeoutMS: 0,
+        keepAlive: true,
+        reconnectTries: 30
+    })
+    .then(client => {
+        console.log('> Connected to database');
+    })
     .catch((connectError) => {
         console.error('Could not connect to MongoDB', connectError);
     });

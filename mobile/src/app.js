@@ -7,11 +7,14 @@ import { setContext } from 'apollo-link-context';
 import { ApolloProvider } from 'react-apollo';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { HttpLink } from 'apollo-link-http';
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import { ReduxCache, apolloReducer } from 'apollo-cache-redux';
 import ReduxLink from 'apollo-link-redux';
 import { onError } from 'apollo-link-error';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { persistStore, persistCombineReducers } from 'redux-persist';
 import thunk from 'redux-thunk';
@@ -93,10 +96,34 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     }
 });
 
+export const wsClient = new SubscriptionClient(`ws://${URL}/subscriptions`, {
+    lazy: true,
+    reconnect: true,
+    connectionParams() {
+        return { jwt: store.getState().auth.jwt };
+    }
+});
+
+const webSocketLink = new WebSocketLink(wsClient);
+
+const requestLink = ({ queryOrMutationLink, subscriptionLink }) => {
+    return ApolloLink.split(
+        ({ query }) => {
+            const { kind, operation } = getMainDefinition(query);
+            return kind === 'OperationDefinition' && operation === 'subscription';
+        },
+        subscriptionLink,
+        queryOrMutationLink
+    );
+};
+
 const link = ApolloLink.from([
     reduxLink,
     errorLink,
-    authLink.concat(httpLink)
+    requestLink({
+        queryOrMutationLink: authLink.concat(httpLink),
+        subscriptionLink: webSocketLink
+    })
 ]);
 
 export const client = new ApolloClient({

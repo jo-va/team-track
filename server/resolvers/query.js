@@ -10,14 +10,6 @@ export const Query = {
         mustBeAuthenticated(ctx, ctx.participant);
         return ctx.participant;
     },    
-    user: (root, { id }, ctx) => {
-        mustBeAuthenticated(ctx, ctx.user);
-        return User.findById(id);
-    },
-    users: (root, args, ctx) => {
-        mustBeAuthenticated(ctx, ctx.user);
-        return User.findAll();
-    },
     participant: (root, { id }, ctx) => {
         mustBeAuthenticated(ctx, ctx.user);
         return Participant.findById(id);

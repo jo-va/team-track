@@ -1,27 +1,83 @@
+# This will boot one container for the API and 4 mongoDB containers:
+# 3 mongo as a cluster, and 1 to issue mongo commands to others
+
 version: '3'
 services:
-    mongo-db:
+    db03:
         image: mongo:latest
         ports:
-            - 27017:27017
+            - 30003:27017
+        command: /usr/bin/mongod --smallfiles --replSet rs --dbpath /data/db --journal
+        container_name: db03
+        restart: always
+        networks:
+            - db_cluster   
+
+    db02:
+        image: mongo:latest
+        ports:
+            - 30002:27017
+        command: /usr/bin/mongod --smallfiles --replSet rs --dbpath /data/db --journal
+        container_name: db02
+        restart: always
+        networks:
+            - db_cluster
+
+    db01:
+        image: mongo:latest
         volumes:
-            - db-data:/data/db
-        command: mongod --smallfiles --logpath=/dev/null
+            - master_db_data:/data/db
+        ports:
+            - 30001:27017
+        links:
+            - db02:db02
+            - db03:db03            
+        command: /usr/bin/mongod --smallfiles --replSet rs --dbpath /data/db --journal
+        container_name: db01
+        restart: always
+        networks:
+            - db_cluster
+
+    db-setup:
+        image: mongo:latest
+        container_name: db-setup
+        depends_on:
+            - db01
+            - db02
+            - db03
+        links:
+            - db01:db01
+            - db02:db02
+            - db03:db03
+        volumes:
+            - ./scripts:/scripts
+        environment:
+            - MONGO1=db01
+            - MONGO2=db02
+            - MONGO3=db03
+            - RS=rs
+        entrypoint: /scripts/db-setup.sh
+        networks:
+            - db_cluster    
 
     api:
         image: api
+        container_name: api
         build:
             context: .
             dockerfile: Dockerfile
             args:
                 NODE_ENV: development
         links:
-            - mongo-db
+            - db01:db01
+            - db02:db02
+            - db03:db03
         depends_on:
-            - mongo-db
+            - db-setup
         ports:
             - 3000:3000
         volumes:
+            - ./scripts:/usr/src/app/scripts
             - yarn:/home/node/.cache/yarn
             - ./.babelrc:/usr/src/app/.babelrc
             - ./.env:/usr/src/app/.env
@@ -29,9 +85,14 @@ services:
             - ./build:/usr/src/app/build
             - ./package.json:/usr/src/app/package.json
             - ./yarn.lock:/usr/src/app/yarn.lock
-        entrypoint: ["sh", "-c"]
-        command: ["yarn dev"]
+        entrypoint: ./scripts/wait-for-db.sh db01
+        command: yarn dev
+        networks:
+            - db_cluster
 
 volumes:
-    db-data:
     yarn:
+    master_db_data:
+
+networks:
+    db_cluster:

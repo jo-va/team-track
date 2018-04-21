@@ -2,5 +2,5 @@ type User {
     id: ID!,
     username: String!
     jwt: String!
-    isAdmin: Boolean!
+    events: [Event]
 }

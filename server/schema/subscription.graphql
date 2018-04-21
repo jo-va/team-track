@@ -1,4 +1,4 @@
 type Subscription {
     participantJoined: Participant
-    groupDistanceUpdated: Float
+    groupDistanceUpdated: Group
 }
