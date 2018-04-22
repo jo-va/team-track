@@ -38,14 +38,14 @@ const MainScreenNavigation = TabNavigator({
                         vertical
                         active={props.navigationState.index === 0}
                         onPress={() => props.navigation.navigate('Main')}>
-                        <Icon name='md-stopwatch' />
+                        <Icon name='md-home' />
                         <Text>Distance</Text>
                     </Button>
                     <Button
                         vertical
                         active={props.navigationState.index === 1}
                         onPress={() => props.navigation.navigate('Map')}>
-                        <Icon name='map' />
+                        <Icon name='md-map' />
                         <Text>Map</Text>
                     </Button>
                 </FooterTab>

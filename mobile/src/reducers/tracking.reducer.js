@@ -17,7 +17,7 @@ const defaultPosition = Immutable({
 });
 
 const initialState = Immutable({
-    tracking: false,
+    isTracking: false,
     position: defaultPosition,
     error: null
 });
@@ -25,14 +25,12 @@ const initialState = Immutable({
 const tracking = (state = initialState, action) => {
     switch (action.type) {
         case START_TRACKING:
-            return Immutable.merge(state, { tracking: true, error: null });
+            return Immutable.merge(state, { isTracking: true, error: null });
         case STOP_TRACKING:
-            return Immutable.merge(state, { tracking: false, error: null });
+            return Immutable.merge(state, { isTracking: false, error: null });
         case TRACKING_ERROR:
-            console.log(action.error);
             return Immutable.merge(state, { error: action.error });
         case POSITION:
-            console.log(action);
             const { position: { coords, timestamp } } = action;
             const position = {
                 latitude: coords.latitude,

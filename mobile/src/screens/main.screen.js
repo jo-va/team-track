@@ -12,7 +12,8 @@ import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 import ParticipantPropTypes from '../graphql/participant.types';
 import {
     startTracking,
-    stopTracking
+    stopTracking,
+    toggleTracking
 } from '../actions/tracking.actions';
 
 class Main extends React.Component {  
@@ -20,6 +21,7 @@ class Main extends React.Component {
         super(props);
 
         this.logout = this.logout.bind(this);
+        this.toggleGeolocation = this.toggleGeolocation.bind(this);
     }
 
     componentDidMount() {
@@ -34,6 +36,10 @@ class Main extends React.Component {
         this.props.dispatch(logout());
     }
 
+    toggleGeolocation() {
+        this.props.dispatch(toggleTracking());
+    }
+
     render() {
         const { loading, participant, tracking } = this.props;
 
@@ -46,7 +52,7 @@ class Main extends React.Component {
         }
 
         return (
-            <Container>             
+            <Container>       
                  <Grid>
                     <Row size={1}>
                         <Distance distance={participant.distance} />
@@ -54,16 +60,19 @@ class Main extends React.Component {
                         <Distance distance={participant.group.event.distance} />
                     </Row>                 
                     <Row size={1}>
-                        <Button>
-                            <Text>Tracking</Text>
-                        </Button>
+                        
                         <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <Text>isTracking: {tracking.isTracking ? 'true' : 'false'}</Text>
+                            <Text>timestamp: {tracking.position.timestamp}</Text>
                             <Text>Latitude: {tracking.position.latitude}</Text>
                             <Text>Longitude: {tracking.position.longitude}</Text>
                             <Text>Accuracy: {tracking.position.accuracy}</Text>
                             <Text>Speed: {tracking.position.speed}</Text>
                             <Text>Heading: {tracking.position.heading}</Text>
                             {tracking.error ? <Text>Error: {tracking.error}</Text> : null}
+                            <Button onPress={this.toggleGeolocation} style={{marginTop: 10}} full bordered>
+                                <Text>Toggle Tracking</Text>
+                            </Button>
                         </View>
                     </Row>
                 </Grid>
