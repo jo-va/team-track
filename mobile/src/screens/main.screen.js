@@ -10,44 +10,24 @@ import Distance from '../components/distance';
 import { logout } from '../actions/auth.actions';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 import ParticipantPropTypes from '../graphql/participant.types';
-/*import {
-    initTracking,
-    finalizeTracking,
+import {
     startTracking,
-    stopTracking,
-    toggleTracking
-} from '../actions/tracking.actions';*/
+    stopTracking
+} from '../actions/tracking.actions';
 
 class Main extends React.Component {  
     constructor(props) {
         super(props);
 
-        this.state = {
-            latitude: null,
-            longitude: null,
-            error: null,
-        };
-
         this.logout = this.logout.bind(this);
     }
 
     componentDidMount() {
-        this.watchId = navigator.geolocation.watchPosition(
-            (position) => {
-                console.log(position);
-                this.setState({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                    error: null,
-                });
-            },
-            (error) => this.setState({ error: error.message }),
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0, distanceFilter: 0 },
-        );
+        this.props.dispatch(startTracking());
     }
 
     componentWillUnmount() {
-        navigator.geolocation.clearWatch(this.watchId);
+        this.props.dispatch(stopTracking());
     }
 
     logout() {
@@ -55,7 +35,7 @@ class Main extends React.Component {
     }
 
     render() {
-        const { loading, participant } = this.props;
+        const { loading, participant, tracking } = this.props;
 
         if (loading || !participant) {
             return (
@@ -78,9 +58,12 @@ class Main extends React.Component {
                             <Text>Tracking</Text>
                         </Button>
                         <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text>Latitude: {this.state.latitude}</Text>
-                            <Text>Longitude: {this.state.longitude}</Text>
-                            {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
+                            <Text>Latitude: {tracking.position.latitude}</Text>
+                            <Text>Longitude: {tracking.position.longitude}</Text>
+                            <Text>Accuracy: {tracking.position.accuracy}</Text>
+                            <Text>Speed: {tracking.position.speed}</Text>
+                            <Text>Heading: {tracking.position.heading}</Text>
+                            {tracking.error ? <Text>Error: {tracking.error}</Text> : null}
                         </View>
                     </Row>
                 </Grid>

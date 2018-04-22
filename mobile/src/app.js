@@ -31,7 +31,7 @@ const URL = '192.168.0.183:3000';
 const config = {
     key: 'root',
     storage: AsyncStorage,
-    blacklist: ['nav', 'apollo'] // don't persist nav for now
+    blacklist: ['nav', 'apollo', 'tracking']
 };
 
 const reducer = persistCombineReducers(config, {

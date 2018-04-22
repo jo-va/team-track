@@ -6,22 +6,44 @@ import {
     POSITION
 } from '../actions/constants';
 
+const defaultPosition = Immutable({
+    latitude: null,
+    longitude: null,
+    altitude: null,
+    speed: null,
+    heading: null,
+    accuracy: null,
+    timestamp: null
+});
+
 const initialState = Immutable({
     tracking: false,
-    location: null,
+    position: defaultPosition,
     error: null
 });
 
 const tracking = (state = initialState, action) => {
     switch (action.type) {
         case START_TRACKING:
-            return Immutable.merge(state, { tracking: true });
+            return Immutable.merge(state, { tracking: true, error: null });
         case STOP_TRACKING:
-            return Immutable.merge(state, { tracking: false });
+            return Immutable.merge(state, { tracking: false, error: null });
         case TRACKING_ERROR:
+            console.log(action.error);
             return Immutable.merge(state, { error: action.error });
         case POSITION:
-            return Immutable.merge(state, { location: action.location });
+            console.log(action);
+            const { position: { coords, timestamp } } = action;
+            const position = {
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+                altitude: coords.altitude,
+                speed: coords.speed,
+                heading: coords.heading,
+                accuracy: coords.accuracy,
+                timestamp: timestamp
+            };
+            return Immutable.merge(state, { position, error: null });
         default:
             return state;
     }
