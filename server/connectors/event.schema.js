@@ -20,7 +20,7 @@ const eventSchema = new mongoose.Schema({
     },
     radius: {
         type: Number,
-        default: 500,
+        default: null,
         min: 0
     },
     distance: {

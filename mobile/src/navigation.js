@@ -16,8 +16,7 @@ import { graphql, compose } from 'react-apollo';
 import { REHYDRATE } from 'redux-persist';
 
 import Main from './screens/main.screen';
-import Group from './screens/group.screen';
-import Event from './screens/event.screen';
+import Map from './screens/map.screen';
 import Join from './screens/join.screen';
 
 import { LOGOUT } from './actions/constants';
@@ -27,8 +26,7 @@ import ParticipantPropTypes from './graphql/participant.types';
 // tabs in main screen
 const MainScreenNavigation = TabNavigator({
     Main: { screen: Main },
-    Group: { screen: Group },
-    Event: { screen: Event }
+    Map: { screen: Map }
 }, {
     initialRouteName: 'Main',
     tabBarPosition: 'bottom',
@@ -46,17 +44,10 @@ const MainScreenNavigation = TabNavigator({
                     <Button
                         vertical
                         active={props.navigationState.index === 1}
-                        onPress={() => props.navigation.navigate('Group')}>
-                        <Icon name='body' />
-                        <Text>Team</Text>
+                        onPress={() => props.navigation.navigate('Map')}>
+                        <Icon name='map' />
+                        <Text>Map</Text>
                     </Button>
-                    <Button
-                        vertical
-                        active={props.navigationState.index === 2}
-                        onPress={() => props.navigation.navigate('Event')}>
-                        <Icon name='flag' />
-                        <Text>Event</Text>
-                    </Button>   
                 </FooterTab>
             </Footer>                                     
         );

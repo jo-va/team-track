@@ -1,58 +1,56 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Container,
-    Content,
-    Header,
-    Title,
-    Button,
-    Icon,
-    Right,
-    Left,
-    Body,
-    Text,
-    Fab,
-    IconNB
-} from 'native-base';
+import { Container, Button, Body, Text } from 'native-base';
 import { View, StyleSheet } from 'react-native';
 import { Grid, Row } from 'react-native-easy-grid';
 import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import Spinner from '../components/spinner';
 import Distance from '../components/distance';
-import hasTracking from '../components/has-tracking';
 import { logout } from '../actions/auth.actions';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 import ParticipantPropTypes from '../graphql/participant.types';
-import {
+/*import {
     initTracking,
     finalizeTracking,
     startTracking,
     stopTracking,
     toggleTracking
-} from '../actions/tracking.actions';
+} from '../actions/tracking.actions';*/
 
 class Main extends React.Component {  
     constructor(props) {
         super(props);
 
         this.state = {
-            menuFab: false
+            latitude: null,
+            longitude: null,
+            error: null,
         };
 
         this.logout = this.logout.bind(this);
     }
 
     componentDidMount() {
-        this.props.dispatch(initTracking());
+        this.watchId = navigator.geolocation.watchPosition(
+            (position) => {
+                console.log(position);
+                this.setState({
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    error: null,
+                });
+            },
+            (error) => this.setState({ error: error.message }),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0, distanceFilter: 0 },
+        );
     }
 
     componentWillUnmount() {
-        finalizeTracking();
+        navigator.geolocation.clearWatch(this.watchId);
     }
 
     logout() {
-        stopTracking();
         this.props.dispatch(logout());
     }
 
@@ -67,18 +65,8 @@ class Main extends React.Component {
             );
         }
 
-        /*
-        <Header>
-            <Left style={{ flex: 1 }} />
-            <Body style={{ flex: 1 }}>
-                <Title>Dashboard</Title>
-            </Body>
-            <Right style={{ flex: 1 }} />
-        </Header>
-        */
-
         return (
-            <Container>
+            <Container>             
                  <Grid>
                     <Row size={1}>
                         <Distance distance={participant.distance} />
@@ -86,28 +74,15 @@ class Main extends React.Component {
                         <Distance distance={participant.group.event.distance} />
                     </Row>                 
                     <Row size={1}>
-                        <Button onPress={toggleTracking}>
+                        <Button>
                             <Text>Tracking</Text>
                         </Button>
+                        <View style={{ flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <Text>Latitude: {this.state.latitude}</Text>
+                            <Text>Longitude: {this.state.longitude}</Text>
+                            {this.state.error ? <Text>Error: {this.state.error}</Text> : null}
+                        </View>
                     </Row>
-                    <View style={{ flex: 1 }}>
-                        <Fab
-                            active={this.state.menuFab}
-                            direction='up'
-                            position='bottomRight'
-                            containerStyle={{}}
-                            style={{ backgroundColor: '#5067ff' }}
-                            onPress={() => this.setState({ menuFab: !this.state.menuFab })}
-                        >
-                            <IconNB name="md-menu" />
-                            <Button style={{ backgroundColor: '#DD5144' }} onPress={this.logout}>
-                                <IconNB name="md-log-out" />
-                            </Button>
-                            <Button style={{ backgroundColor: 'green' }} onPress={toggleTracking}>
-                                <IconNB name="md-pin" />
-                            </Button>
-                        </Fab>
-                    </View>
                 </Grid>
             </Container>
         );

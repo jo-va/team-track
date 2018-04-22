@@ -56,9 +56,11 @@ const move = async (id, latitude, longitude) => {
     }
 
     // make sure the participant is within the allowed event perimeter
-    const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
-    if (dist2center > event.radius) {
-        return db.Participant.findByIdAndUpdate(id, { $set: { state: 'inactive' } }, { new: true }).exec();
+    if (event.radius != null) {
+        const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
+        if (dist2center > event.radius) {
+            return db.Participant.findByIdAndUpdate(id, { $set: { state: 'inactive' } }, { new: true }).exec();
+        }
     }
 
     // If we just entered the perimeter, don't update the distance since the last point was outside,

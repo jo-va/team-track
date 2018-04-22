@@ -22,7 +22,7 @@ export const Subscription = {
         subscribe: withFilter(
             () => pubsub.asyncIterator(PARTICIPANT_JOINED),
             (payload, args, ctx) => {
-                console.log(payload, args, ctx);
+                //console.log(payload, args, ctx);
                 //return Boolean(payload.participantJoined.group == ctx.participant.group);
                 return Boolean(payload.participantJoined.group == args.group);
             }
@@ -32,7 +32,7 @@ export const Subscription = {
         subscribe: withFilter(
             () => pubsub.asyncIterator(GROUP_DISTANCE_UPDATED),
             (payload, args, ctx) => {
-                console.log(payload, args, ctx);
+                //console.log(payload, args, ctx);
                 //return Boolean(payload.groupDistanceUpdated.id == ctx.participant.group);
                 return Boolean(payload.groupDistanceUpdated.id == args.group);
             }
@@ -42,7 +42,7 @@ export const Subscription = {
         subscribe: withFilter(
             () => pubsub.asyncIterator(EVENT_DISTANCE_UPDATED),
             (payload, args, ctx) => {
-                console.log(payload, args, ctx);
+                //console.log(payload, args, ctx);
                 //return Boolean(payload.eventDistanceUpdated.id == ctx.participant.event);
                 return Boolean(payload.eventDistanceUpdated.id == args.event);
             }

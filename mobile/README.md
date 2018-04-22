@@ -15,3 +15,7 @@ https://medium.com/handlebar-labs/graphql-authentication-with-react-native-apoll
 https://code.tutsplus.com/tutorials/common-react-native-app-layouts-login-page--cms-27639
 
 https://medium.com/react-native-training/building-chatty-part-7-authentication-in-graphql-cd37770e5ab3
+
+https://facebook.github.io/react-native/docs/geolocation.html
+
+https://github.com/react-community/react-native-maps/blob/master/docs/installation.md
