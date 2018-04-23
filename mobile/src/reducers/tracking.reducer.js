@@ -1,4 +1,7 @@
 import Immutable from 'seamless-immutable';
+import { Toast } from 'native-base';
+import { REHYDRATE } from 'redux-persist';
+import { LOGOUT } from '../actions/constants';
 import {
     START_TRACKING,
     STOP_TRACKING,
@@ -16,19 +19,35 @@ const defaultPosition = Immutable({
     timestamp: null
 });
 
-const initialState = Immutable({
+const INITIAL_STATE = Immutable({
     isTracking: false,
     position: defaultPosition,
     error: null
 });
 
-const tracking = (state = initialState, action) => {
+const tracking = (state = INITIAL_STATE, action) => {
     switch (action.type) {
+        case REHYDRATE:
+            return state;
+        case LOGOUT:
+            return state;
         case START_TRACKING:
+            Toast.show({
+                text: 'Tracking started',
+                type: 'success'
+            });
             return Immutable.merge(state, { isTracking: true, error: null });
         case STOP_TRACKING:
+            Toast.show({
+                text: 'Tracking stopped'
+            });
             return Immutable.merge(state, { isTracking: false, error: null });
         case TRACKING_ERROR:
+            Toast.show({
+                text: `Tracking error: ${action.error}`,
+                type: 'danger',
+                duration: 10000
+            });
             return Immutable.merge(state, { error: action.error });
         case POSITION:
             const { position: { coords, timestamp } } = action;

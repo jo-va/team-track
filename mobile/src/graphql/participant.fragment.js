@@ -15,15 +15,15 @@ const PARTICIPANT_FRAGMENT = gql`
             participants {
                 username
             }
-            event {
-                id
-                name
-                distance
-                latitude
-                longitude
-                state
-            }
         }
+        event {
+            id
+            name
+            distance
+            latitude
+            longitude
+            state
+        }        
     }
 `;
 

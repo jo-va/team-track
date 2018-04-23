@@ -38,7 +38,7 @@ export const FormInput = props => {
             selectionColor='white'
             autoFocus={false}
             autoCorrect={false}
-            blurOnSubmit={true}
+            blurOnSubmit={false}
             autoCapitalize='none'
             placeholderTextColor='white'
             containerStyle={{ width: '100%' }}

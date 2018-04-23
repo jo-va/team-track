@@ -15,15 +15,15 @@ export const ParticipantPropTypes = PropTypes.shape({
             PropTypes.shape({
                 username: PropTypes.string.isRequired
             })
-        ),
-        event: PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired,
-            distance: PropTypes.number.isRequired,
-            latitude: PropTypes.number,
-            longitude: PropTypes.number,
-            state: PropTypes.string.isRequired
-        })
+        )
+    }),
+    event: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        distance: PropTypes.number.isRequired,
+        latitude: PropTypes.number,
+        longitude: PropTypes.number,
+        state: PropTypes.string.isRequired
     })
 });
 

@@ -13,3 +13,6 @@ https://medium.com/@shemleong/using-docker-and-yarn-for-development-2546e567ad2
 https://github.com/kriasoft/nodejs-api-starter
 
 https://www.sohamkamani.com/blog/2016/06/30/docker-mongo-replica-set/
+
+https://facebook.github.io/react-native/docs/signed-apk-android.html
+cd android && ./gradlew assembleRelease

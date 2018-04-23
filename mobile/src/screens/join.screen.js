@@ -230,6 +230,7 @@ class Join extends React.Component {
                         errorMessage={this.state.secretError}
                         onChangeText={value => this.handleInputChange('secret', value)}
                         onBlur={this.validateSecret}
+                        blurOnSubmit={true}
                         onSubmitEditing={() => {
                             this.validateSecret();
                         }}
