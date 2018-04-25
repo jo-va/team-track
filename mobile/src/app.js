@@ -26,7 +26,7 @@ import auth from './reducers/auth.reducer';
 import tracking from './reducers/tracking.reducer';
 import { logout } from './actions/auth.actions';
 
-const URL = '192.168.0.183:3000';
+const URL = 'dull-fireant-65.localtunnel.me:3000';//192.168.0.183:3000';
 
 const config = {
     key: 'root',

@@ -104,7 +104,7 @@ export const Participant = {
 };
 
 // Change stream event handler listening to group distance changes triggered by Participant.move()
-db.MongoDBConnection.then(mongodb => {
+/*db.MongoDBConnection.then(mongodb => {
     const distance_increment_threshold = 5;
 
     const pipeline = [{
@@ -123,3 +123,4 @@ db.MongoDBConnection.then(mongodb => {
         Event.onDistanceUpdated(await event);
     });
 });
+*/

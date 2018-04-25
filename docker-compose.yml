@@ -1,5 +1,17 @@
 version: '3'
 services:
+    rdb:
+        image: rethinkdb
+        container_name: rdb
+        ports:
+            - 8080:8080
+            - 28015:28015
+            - 29015:29015
+        volumes:
+            - rdb-data:/data
+        command: rethinkdb --bind all --directory /data 
+        restart: always
+
     api:
         image: api
         container_name: api
@@ -8,6 +20,10 @@ services:
             dockerfile: Dockerfile
             args:
                 NODE_ENV: development
+        links:
+            - rdb
+        depends_on:
+            - rdb
         ports:
             - 3000:3000
         volumes:
@@ -19,7 +35,9 @@ services:
             - ./package.json:/usr/src/app/package.json
             - ./yarn.lock:/usr/src/app/yarn.lock
         entrypoint: sh -c
-        command: yarn dev
+        command: ["yarn dev"]
+        restart: always
 
 volumes:
     yarn:
+    rdb-data:
