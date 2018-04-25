@@ -44,22 +44,29 @@ const add = async ({ name, latitude, longitude, radius}) => {
         r.expr(event).merge({
             createdAt: r.now()
         }),
-        { returnChanges: true }
+        { returnChanges: 'always' }
     );
 
     return result.changes[0].new_val;
 };
 
-let distanceHandler = null;
+const onDistanceUpdate = handler => {
+    const r = getRethink();
 
-const registerDistanceUpdatedHandler = handler => {
-    distanceHandler = handler;
-};
-
-const onDistanceUpdated = event => {
-    if (distanceHandler) {
-        distanceHandler(event);
-    }
+    r.table('events')
+        .changes({ includeInitial: false })
+        .filter(r.row('new_val')('distance').ne(r.row('old_val')('distance')))
+        .run()
+        .then(cursor => {
+            cursor.each(async (err, record) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('event handler called');
+                    handler(record.new_val);
+                }
+            })
+        });
 };
 
 export const Event = {
@@ -67,6 +74,5 @@ export const Event = {
     findById,
     findAllById,
     add,
-    onDistanceUpdated,
-    registerDistanceUpdatedHandler
+    onDistanceUpdate
 };

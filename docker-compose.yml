@@ -34,7 +34,7 @@ services:
             - ./build:/usr/src/app/build
             - ./package.json:/usr/src/app/package.json
             - ./yarn.lock:/usr/src/app/yarn.lock
-        entrypoint: sh -c
+        entrypoint: "sh -c"
         command: ["yarn dev"]
         restart: always
 

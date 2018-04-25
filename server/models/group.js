@@ -77,23 +77,29 @@ const add = async ({ name, secret, event }) => {
         r.expr(group).merge({
             createdAt: r.now()
         }),
-        { returnChanges: true }
+        { returnChanges: 'always' }
     );
 
     return result.changes[0].new_val;
 };
 
-let distanceHandler = null;
+const onDistanceUpdate = handler => {
+    const r = getRethink();
 
-const registerDistanceUpdatedHandler = handler => {
-    return null;
-    distanceHandler = handler;
-};
-
-const onDistanceUpdated = group => {
-    if (distanceHandler) {
-        distanceHandler(group);
-    }
+    r.table('groups')
+        .changes({ includeInitial: false })
+        .filter(r.row('new_val')('distance').ne(r.row('old_val')('distance')))
+        .run()
+        .then(cursor => {
+            cursor.each(async (err, record) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('group handler called');
+                    handler(record.new_val);
+                }
+            })
+        });
 };
 
 export const Group = {
@@ -102,6 +108,5 @@ export const Group = {
     findAll,
     findBySecret,
     add,
-    onDistanceUpdated,
-    registerDistanceUpdatedHandler
+    onDistanceUpdate,
 };

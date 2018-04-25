@@ -64,7 +64,7 @@ const add = async (username, secret) => {
         r.expr(participant).merge({
             createdAt: r.now()
         }),
-        { returnChanges: true }
+        { returnChanges: 'always' }
     );
 
     return result.changes[0].new_val;
@@ -86,13 +86,12 @@ const move = async (id, latitude, longitude) => {
     }
 
     // make sure the participant is within the allowed event perimeter
-    if (event.radius != null) {
+    if (event.radius && event.radius > 0) {
         const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
         if (dist2center > event.radius) {
             const result = await r.table('participants').get(id).update({
                 state: 'inactive'
-            }, { returnChanges: true });
-            console.log(result);
+            }, { returnChanges: 'always' });
             return result.changes[0].new_val;
         }
     }
@@ -102,29 +101,48 @@ const move = async (id, latitude, longitude) => {
     if (participant.state === 'inactive') {
         const result = await r.table('participants').get(id).update({
             state: 'active'
-        }, { returnChanges: true });
+        }, { returnChanges: 'always' });
         return result.changes[0].new_val;
     }
 
-    // Calculate new distance
+    // Calculate displacement
     const increment = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
-    const distance = participant.distance + increment;
 
     if (increment > 0) {
-        const result = await r.table('groups').get(participant.group).update({
-            eventDistanceIncrement: r.row('eventDistanceIncrement') + increment,
-            distance: r.row('distance') + increment
-        }, { returnChanges: true });
+        const result = await r.table('groups').get(participant.group).update(group => {
+            return r.branch(
+                // check if the threshold is reached and if we are the first to reach it
+                group('eventDistanceIncrement').gt(process.env.EVENT_DISTANCE_UPDATE_THRESHOLD) &&
+                group('eventLocked').default(false).eq(false),
+                {
+                    distance: group('distance').add(increment).default(0),
+                    eventDistanceIncrement: increment,
+                    eventLocked: true
+                },
+                {
+                    distance: group('distance').add(increment).default(0),
+                    eventDistanceIncrement: group('eventDistanceIncrement').add(increment).default(0),
+                    eventLocked: false
+                }
+            );
+        }, {
+            returnChanges: 'always'
+        });
 
-        Group.onDistanceUpdated(result.changes[0].new_val);
+        const changes = result.changes[0];
+        if (changes.new_val.eventLocked === true) {
+            await r.table('events').get(participant.event).update({
+                distance: r.row('distance').add(changes.old_val.eventDistanceIncrement)
+            });
+        }
     }
 
     const result = await r.table('participants').get(id).update({
         state: 'active',
         longitude,
         latitude,
-        distance
-    }, { returnChanges: true });
+        distance: r.row('distance').add(increment).default(0)
+    }, { returnChanges: 'always' });
 
     return result.changes[0].new_val;
 };
@@ -137,25 +155,3 @@ export const Participant = {
     add,
     move
 };
-
-// Change stream event handler listening to group distance changes triggered by Participant.move()
-/*db.MongoDBConnection.then(mongodb => {
-    const distance_increment_threshold = 5;
-
-    const pipeline = [{
-        $match: { 'fullDocument.eventDistanceIncrement': { $gte: distance_increment_threshold } }
-    }];
-
-    mongodb.collection('groups').watch(pipeline, {
-        fullDocument: 'updateLookup'
-    }).on('change', async (data) => {
-        const increment = data.fullDocument.eventDistanceIncrement;
-        console.log(`event distance +${increment}`);
-
-        db.Group.findByIdAndUpdate(data.fullDocument._id, { $set: { eventDistanceIncrement: 0 } }).exec();
-        const event = db.Event.findByIdAndUpdate(data.fullDocument.event, { $inc: { distance: increment } }, { new: true }).exec();
-
-        Event.onDistanceUpdated(await event);
-    });
-});
-*/

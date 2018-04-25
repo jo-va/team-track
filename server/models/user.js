@@ -30,8 +30,8 @@ const addEvent = async (userId, eventId) => {
     const r = getRethink();
 
     const result = await r.table('users').get(userId).update({
-        events: r.row('events').append(eventId)
-    }, { returnChanges: true });
+        events: r.row('events').default([]).append(eventId)
+    }, { returnChanges: 'always' });
     
     return result.changes[0].new_val;
 }
@@ -65,7 +65,7 @@ const add = async ({ username, password }) => {
         r.expr(user).merge({
             createdAt: r.now()
         }),
-        { returnChanges: true }
+        { returnChanges: 'always' }
     );
 
     return result.changes[0].new_val;
