@@ -73,22 +73,7 @@ graphQLServer.listen(GRAPHQL_PORT, () => {
 const subscriptionServer = SubscriptionServer.create({
     schema: executableSchema,
     execute,
-    subscribe,
-    /*onConnect: async (connectionParams, webSocket) => {
-        console.log(connectionParams);
-        if (connectionParams.jwt) {
-            const decoded = await jsonwebtoken.verify(connectionParams.jwt, process.env.JWT_SECRET);
-            return getUserOrParticipant(decoded);
-        }
-    },
-    onOperation: async (parsedMessage, baseParams) => {
-        const { subscriptionName, args } = getSubscriptionDetails({
-            baseParams,
-            schema: executableSchema
-        });
-
-        return subscriptionLogic[subscriptionName](baseParams, args, baseParams.context);
-    }*/
+    subscribe
 }, {
     server: graphQLServer,
     path: SUBSCRIPTIONS_PATH

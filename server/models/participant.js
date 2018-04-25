@@ -147,11 +147,30 @@ const move = async (id, latitude, longitude) => {
     return result.changes[0].new_val;
 };
 
+const onParticipantJoined = handler => {
+    const r = getRethink();
+
+    r.table('participants')
+        .changes({ includeInitial: false })
+        .filter(r.row('old_val').eq(null))
+        .run()
+        .then(cursor => {
+            cursor.each(async (err, record) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    handler(record.new_val);
+                }
+            })
+        });
+};
+
 export const Participant = {
     findAll,
     findById,
     findByIdAndVersion,
     findAllByGroupId,
     add,
-    move
+    move,
+    onParticipantJoined
 };

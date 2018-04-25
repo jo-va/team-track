@@ -95,7 +95,6 @@ const onDistanceUpdate = handler => {
                 if (err) {
                     console.error(err);
                 } else {
-                    console.log('group handler called');
                     handler(record.new_val);
                 }
             })

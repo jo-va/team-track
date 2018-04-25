@@ -62,7 +62,6 @@ const onDistanceUpdate = handler => {
                 if (err) {
                     console.error(err);
                 } else {
-                    console.log('event handler called');
                     handler(record.new_val);
                 }
             })
