@@ -1,64 +1,92 @@
-import { Types } from 'mongoose';
-import * as db from '../connectors';
+import crypto from 'crypto';
+import getRethink from '../connectors/rethink-driver';
 
-const findAll = () => {
-    return db.Group.find({}).exec();
+const findAll = async () => {
+    const r = getRethink();
+    return r.table('groups');
 };
 
-const findAllByEventId = (event) => {
-    if (event) {
-        return Types.ObjectId.isValid(event) ? db.Group.find({ event }).exec() : [];
+const findAllByEventId = async (eventId) => {
+    const r = getRethink();
+    if (eventId) {
+        return r.table('groups').filter({ event: eventId });
+    } else {
+        return r.table('groups');
     }
-    return db.Group.find({}).exec();
 };
 
-const findById = (id) => {
-    return db.Group.findById(id).exec();
+const findById = async (id) => {
+    const r = getRethink();
+    return r.table('groups').get(id).default(null);
 };
 
-const findByName = (name) => {
-    return db.Group.findOne({ name }).exec();
+const findByName = async (name) => {
+    const r = getRethink();
+    return r.table('groups')
+        .filter(doc => doc('name').downcase().eq(name.toLowerCase()))
+        .nth(0)
+        .default(null);
 };
 
-const findBySecret = (secret) => {
-    return db.Group.findOne({ secret }).exec();
+const findBySecret = async (secret) => {
+    const r = getRethink();
+    return r.table('groups')
+        .filter({ secret })
+        .nth(0)
+        .default(null);
 };
 
-const add = async (group) => {
+const add = async ({ name, secret, event }) => {
+    const group = {
+        name: name.trim(),
+        secret: secret ? secret.trim() : crypto.randomBytes(3).toString('hex'),
+        event,
+        distance: 0,
+        eventDistanceIncrement: 0
+    };
+
     // name must be specified
-    if (!group.name || !group.name.trim()) {
+    if (!group.name) {
         throw new Error('Group name cannot be blank');
-    }
-
-    // An event must exist for this group
-    if (!Types.ObjectId.isValid(group.event)) {
-        throw new Error('Invalid Event ID');
-    }
-    const event = await db.Event.findById(group.event).exec();
-    if (!event) {
-        throw new Error(`Found no event with id ${group.event}`);
     }
 
     // The name must be unique
     let duplicate = await findByName(group.name);
+    console.log(duplicate);
+    console.log(group);
     if (duplicate) {
         throw new Error('A group already exists with this name');
     }
 
     // The secret must be unique
-    if (group.secret && group.secret.trim()) {
+    if (group.secret) {
         duplicate = await findBySecret(group.secret);
         if (duplicate) {
             throw new Error('This secret is already used');
         }
     }
 
-    return db.Group.create(group);
+    // An event must exist for this group
+    const r = getRethink();
+    const eventFound = await r.table('events').get(event).default(null);
+    if (!eventFound) {
+        throw new Error(`Found no event with id ${event}`);
+    }    
+
+    const result = await r.table('groups').insert(
+        r.expr(group).merge({
+            createdAt: r.now()
+        }),
+        { returnChanges: true }
+    );
+
+    return result.changes[0].new_val;
 };
 
 let distanceHandler = null;
 
 const registerDistanceUpdatedHandler = handler => {
+    return null;
     distanceHandler = handler;
 };
 

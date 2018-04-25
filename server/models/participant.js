@@ -1,30 +1,35 @@
-import { Types } from 'mongoose';
-import * as db from '../connectors';
+import getRethink from '../connectors/rethink-driver';
 import { Group } from './group';
 import { Event } from './event';
 import { calculateDistance } from './distance';
 
-const findAll = () => {
-    return db.Participant.find({}).exec();
+const findAll = async () => {
+    const r = getRethink();
+    return r.table('participants');
 };
 
-const findById = (id) => {
-    return db.Participant.findById(id).exec();
+const findById = async (id) => {
+    const r = getRethink();
+    return r.table('participants').get(id).default(null);
 };
 
-const findByIdAndVersion = (id, version) => {
-    return db.Participant.findOne({ _id: id, version }).exec();
+const findByIdAndVersion = async (id, version) => {
+    const r = getRethink();
+    return r.table('participants')
+        .filter({ id, version })
+        .nth(0)
+        .default(null);
 };
 
-const findAllByGroupId = (id) => {
-    if (id) {
-        return Types.ObjectId.isValid(id) ?
-            db.Participant.find({ group: id }).exec() : [];
+const findAllByGroupId = async (groupId) => {
+    const r = getRethink();
+    if (groupId) {
+        return r.table('participants').filter({ group: groupId });
+    } else {
+        return r.table('participants');
     }
-    return db.Participant.find({}).exec();
 };
 
-// Add a new participant to a group
 const add = async (username, secret) => {
     // The secret token for the group must be valid
     const group = await Group.findBySecret(secret);
@@ -32,25 +37,50 @@ const add = async (username, secret) => {
         throw new Error('No group found');
     }
 
-    const participant = { username: username.trim(), group: group._id, event: group.event };
+    const participant = {
+        username: username.trim(),
+        group: group.id,
+        event: group.event,
+        distance: 0,
+        latitude: null,
+        longitude: null,
+        state: 'inactive',
+        version: 1
+    };
+
+    const r = getRethink();
 
     // The username shall be unique within the group
-    const foundParticipant = await db.Participant.findOne(participant).exec();
-    if (foundParticipant) {
+    const participantFound = await r.table('participants')
+        .filter(doc => doc('username').downcase().eq(participant.username.toLowerCase()) && doc('group').eq(group.id))
+        .nth(0)
+        .default(null);
+    
+    if (participantFound) {
         throw new Error('User already exists');
     }
-    return db.Participant.create(participant);
+
+    const result = await r.table('participants').insert(
+        r.expr(participant).merge({
+            createdAt: r.now()
+        }),
+        { returnChanges: true }
+    );
+
+    return result.changes[0].new_val;
 };
 
 // Updates the participant's position and distance
 // If the position is valid, the group's distance will be updated as well,
 // Returns the updated participant and group
 const move = async (id, latitude, longitude) => {
-    const participant = await db.Participant.findById(id).populate('event').exec();
+    const r = getRethink();
+
+    const participant = await r.table('participants').get(id).default(null);
     if (!participant) {
         throw new Error('You must join a group');
     }
-    const event = participant.event;
+    const event = await r.table('events').get(participant.event).default(null);
     if (!event) {
         throw new Error('No event found');
     }
@@ -59,14 +89,21 @@ const move = async (id, latitude, longitude) => {
     if (event.radius != null) {
         const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
         if (dist2center > event.radius) {
-            return db.Participant.findByIdAndUpdate(id, { $set: { state: 'inactive' } }, { new: true }).exec();
+            const result = await r.table('participants').get(id).update({
+                state: 'inactive'
+            }, { returnChanges: true });
+            console.log(result);
+            return result.changes[0].new_val;
         }
     }
 
     // If we just entered the perimeter, don't update the distance since the last point was outside,
     // update the state only
     if (participant.state === 'inactive') {
-        return db.Participant.findByIdAndUpdate(id, { $set: { state: 'active' } }, { new: true }).exec();
+        const result = await r.table('participants').get(id).update({
+            state: 'active'
+        }, { returnChanges: true });
+        return result.changes[0].new_val;
     }
 
     // Calculate new distance
@@ -74,24 +111,22 @@ const move = async (id, latitude, longitude) => {
     const distance = participant.distance + increment;
 
     if (increment > 0) {
-        const updatedGroup = db.Group.findByIdAndUpdate(participant.group, {
-            $inc: {
-                eventDistanceIncrement: increment,
-                distance: increment
-            }
-        }, { new: true }).exec();
+        const result = await r.table('groups').get(participant.group).update({
+            eventDistanceIncrement: r.row('eventDistanceIncrement') + increment,
+            distance: r.row('distance') + increment
+        }, { returnChanges: true });
 
-        Group.onDistanceUpdated(await updatedGroup);
+        Group.onDistanceUpdated(result.changes[0].new_val);
     }
 
-    return db.Participant.findByIdAndUpdate(id, {
-        $set: {
-            state: 'active',
-            longitude,
-            latitude,
-            distance
-        }
-    }, { new: true }).exec();
+    const result = await r.table('participants').get(id).update({
+        state: 'active',
+        longitude,
+        latitude,
+        distance
+    }, { returnChanges: true });
+
+    return result.changes[0].new_val;
 };
 
 export const Participant = {

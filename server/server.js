@@ -26,11 +26,11 @@ const executableSchema = makeExecutableSchema({
     resolvers
 });
 
-const getUserOrParticipant = async (decoded) => ({
+const getUserOrParticipant = async (decoded, jwt) => ({
     user: decoded && decoded.type === 'user' ?
-        await User.findByIdAndVersion(decoded.id, decoded.version) : null,
+        { ...await User.findByIdAndVersion(decoded.id, decoded.version), jwt } : null,
     participant: decoded && decoded.type === 'participant' ?
-        await Participant.findByIdAndVersion(decoded.id, decoded.version) : null,
+        { ...await Participant.findByIdAndVersion(decoded.id, decoded.version), jwt } : null,
 });
 
 const app = express();
@@ -41,11 +41,18 @@ app.use(cors('*'));
 
 app.use('/graphql', bodyParser.json(), jwt({
     secret: process.env.JWT_SECRET,
-    credentialsRequired: false
+    credentialsRequired: false,
+    getToken: (req) => {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+            req.jwt = req.headers.authorization.split(' ')[1];
+            return req.jwt;
+        }
+        return null;
+      }
 }), graphqlExpress(async (req) => ({
     schema: executableSchema,
     context: {
-        ...await getUserOrParticipant(req.user),
+        ...await getUserOrParticipant(req.user, req.jwt),
         secret: process.env.JWT_SECRET
     },
     debug: process.env.ENVIRONMENT === 'dev'

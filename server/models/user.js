@@ -1,40 +1,74 @@
-import { Types } from 'mongoose';
-import * as db from '../connectors';
+import getRethink from '../connectors/rethink-driver';
 
-const findAll = () => {
-    return db.User.find({}).exec();
+const findAll = async () => {
+    const r = getRethink();
+    return r.table('users');
 };
 
-const findById = (id) => {
-    return db.User.findById(id).exec();
+const findById = async (id) => {
+    const r = getRethink();
+    return r.table('users').get(id).default(null);
 };
 
-const findByIdAndVersion = (id, version) => {
-    return db.User.findOne({ _id: id, version }).exec();
+const findByIdAndVersion = async (id, version) => {
+    const r = getRethink();
+    return r.table('users')
+        .filter({ id, version })
+        .nth(0)
+        .default(null);
 };
 
-const findByUsername = (username) => {
-    return db.User.findOne({ username }).exec();
+const findByUsername = async (username) => {
+    const r = getRethink();
+    return r.table('users')
+        .filter(doc => doc('username').downcase().eq(username.toLowerCase()))
+        .nth(0)
+        .default(null);
 };
 
-const addEvent = (userId, eventId) => {
-    return db.User.findByIdAndUpdate(userId, { $push: { events: eventId } }, { new: true });
+const addEvent = async (userId, eventId) => {
+    const r = getRethink();
+
+    const result = await r.table('users').get(userId).update({
+        events: r.row('events').append(eventId)
+    }, { returnChanges: true });
+    
+    return result.changes[0].new_val;
 }
 
-const add = async (user) => {
-    // The username must be specified
-    if (!user.username || !user.username.trim()) {
+const add = async ({ username, password }) => {
+    const user = {
+        username: username.trim(),
+        password,
+        events: [],
+        version: 1
+    };
+
+    if (!user.username) {
         throw new Error('Username cannot be blank');
-    }    
+    }
+    if (!password) {
+        throw new Error('Password cannot be blank');
+    }
 
-    // The username shall be unique
-    const foundUser = await db.User.findOne({ username: user.username }).exec();
+    const r = getRethink();
 
-    if (foundUser && foundUser.username === user.username) {
+    const userFound = await r.table('users')
+        .filter(doc => doc('username').downcase().eq(user.username.toLowerCase()))
+        .nth(0)
+        .default(null);
+    if (userFound) {
         throw new Error('User already exists');
     }
 
-    return db.User.create(user);
+    const result = await r.table('users').insert(
+        r.expr(user).merge({
+            createdAt: r.now()
+        }),
+        { returnChanges: true }
+    );
+
+    return result.changes[0].new_val;
 };
 
 export const User = {
