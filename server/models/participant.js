@@ -52,12 +52,13 @@ const add = async (username, secret) => {
 
     // The username shall be unique within the group
     const participantFound = await r.table('participants')
-        .filter(doc => doc('username').downcase().eq(participant.username.toLowerCase()) && doc('group').eq(group.id))
+        .filter(r.row('username').downcase().eq(participant.username.toLowerCase()).and(r.row('group').eq(group.id)))
         .nth(0)
         .default(null);
+    console.log(participantFound)
     
     if (participantFound) {
-        throw new Error('User already exists');
+        throw new Error(`User ${participant.username} already exists`);
     }
 
     const result = await r.table('participants').insert(
@@ -112,7 +113,7 @@ const move = async (id, latitude, longitude) => {
         const result = await r.table('groups').get(participant.group).update(group => {
             return r.branch(
                 // check if the threshold is reached and if we are the first to reach it
-                group('eventDistanceIncrement').gt(process.env.EVENT_DISTANCE_UPDATE_THRESHOLD) &&
+                group('eventDistanceIncrement').ge(process.env.EVENT_DISTANCE_UPDATE_THRESHOLD) &&
                 group('eventLocked').default(false).eq(false),
                 {
                     distance: group('distance').add(increment).default(0),

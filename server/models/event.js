@@ -32,7 +32,7 @@ const add = async ({ name, latitude, longitude, radius}) => {
     const r = getRethink();
 
     const eventFound = await r.table('events')
-        .filter(doc => doc('name').downcase().eq(name.toLowerCase()))
+        .filter(r.row('name').downcase().eq(name.toLowerCase()))
         .nth(0)
         .default(null);
 

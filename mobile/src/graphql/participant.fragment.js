@@ -5,23 +5,16 @@ const PARTICIPANT_FRAGMENT = gql`
         id        
         username
         distance
-        latitude
-        longitude
         state
         group {
             id
             name
             distance
-            participants {
-                username
-            }
         }
         event {
             id
             name
             distance
-            latitude
-            longitude
             state
         }        
     }

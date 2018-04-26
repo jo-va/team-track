@@ -9,6 +9,9 @@ import { graphql, compose } from 'react-apollo';
 import Spinner from '../components/spinner';
 import Meter from '../components/meter';
 import { logout } from '../actions/auth.actions';
+import { wsClient } from '../app';
+import GROUP_DISTANCE_UPDATED_SUBSCRIPTION from '../graphql/group-distance.subscription';
+import EVENT_DISTANCE_UPDATED_SUBSCRIPTION from '../graphql/event-distance.subscription';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 import ParticipantPropTypes from '../graphql/participant.types';
 import {
@@ -43,6 +46,62 @@ class Main extends React.Component {
 
         this.logout = this.logout.bind(this);
         this.toggleGeolocation = this.toggleGeolocation.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (!this.groupDistanceSubscription) {
+            this.groupDistanceSubscription = this.props.subscribeToMore({
+                document: GROUP_DISTANCE_UPDATED_SUBSCRIPTION,
+                variables: {
+                    group: nextProps.participant.group.id
+                },
+                updateQuery: (prev, { subscriptionData }) => {
+                    if (!subscriptionData.data) {
+                        return prev;
+                    }
+                    const distance = subscriptionData.data.groupDistanceUpdated.distance;
+
+                    return Object.assign({}, prev, {
+                        currentParticipant: {
+                            ...prev.currentParticipant,
+                            group: {
+                                ...prev.currentParticipant.group,
+                                distance
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        if (!this.eventDistanceSubscription) {
+            this.eventDistanceSubscription = this.props.subscribeToMore({
+                document: EVENT_DISTANCE_UPDATED_SUBSCRIPTION,
+                variables: {
+                    event: nextProps.participant.event.id
+                },
+                updateQuery: (prev, { subscriptionData }) => {
+                    if (!subscriptionData.data) {
+                        return prev;
+                    }
+                    const distance = subscriptionData.data.eventDistanceUpdated.distance;
+
+                    return Object.assign({}, prev, {
+                        currentParticipant: {
+                            ...prev.currentParticipant,
+                            event: {
+                                ...prev.currentParticipant.event,
+                                distance
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        if (!this.reconnected) {
+            this.reconnected = wsClient.onReconnected(() => {
+                this.props.refetch();
+            }, this);
+        }
     }
 
     componentWillUnmount() {
@@ -98,7 +157,7 @@ class Main extends React.Component {
                         />
 
                         <Meter
-                            value={this.formatDistance(participant.group.distance)}
+                            value={this.formatDistance(participant.group.distance, 1)}
                             title={participant.group.name}
                             label='DISTANCE (km)'
                         />
@@ -167,10 +226,12 @@ Main.propTypes = {
 
 const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
     skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
-    options: ownProps => ({ fetchPolicy: 'cache-only' }),
-    props: ({ data: { loading, currentParticipant } }) => ({
+    //options: ownProps => ({ fetchPolicy: 'cache-only' }),
+    props: ({ data: { loading, currentParticipant, refetch, subscribeToMore } }) => ({
         loading,
-        participant: currentParticipant
+        participant: currentParticipant,
+        refetch,
+        subscribeToMore
     })
 });
 

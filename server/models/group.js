@@ -23,7 +23,7 @@ const findById = async (id) => {
 const findByName = async (name) => {
     const r = getRethink();
     return r.table('groups')
-        .filter(doc => doc('name').downcase().eq(name.toLowerCase()))
+        .filter(r.row('name').downcase().eq(name.toLowerCase()))
         .nth(0)
         .default(null);
 };

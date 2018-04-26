@@ -21,7 +21,7 @@ const findByIdAndVersion = async (id, version) => {
 const findByUsername = async (username) => {
     const r = getRethink();
     return r.table('users')
-        .filter(doc => doc('username').downcase().eq(username.toLowerCase()))
+        .filter(r.row('username').downcase().eq(username.toLowerCase()))
         .nth(0)
         .default(null);
 };
@@ -54,7 +54,7 @@ const add = async ({ username, password }) => {
     const r = getRethink();
 
     const userFound = await r.table('users')
-        .filter(doc => doc('username').downcase().eq(user.username.toLowerCase()))
+        .filter(r.row('username').downcase().eq(user.username.toLowerCase()))
         .nth(0)
         .default(null);
     if (userFound) {
