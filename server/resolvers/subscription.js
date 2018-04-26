@@ -23,7 +23,7 @@ export const Subscription = {
                 return pubsub.asyncIterator(PARTICIPANT_JOINED);
             },
             (payload, args, ctx) => {
-                return Boolean(payload.participantJoined.group == args.group);
+                return Boolean(payload.participantJoined.group === args.group);
             }
         )
     },
@@ -39,7 +39,7 @@ export const Subscription = {
                 return pubsub.asyncIterator(GROUP_DISTANCE_UPDATED);
             },
             (payload, args, ctx) => {
-                return Boolean(payload.groupDistanceUpdated.id == args.group);
+                return Boolean(payload.groupDistanceUpdated.id === args.group);
             }
         )
     },
@@ -55,7 +55,7 @@ export const Subscription = {
                 return pubsub.asyncIterator(EVENT_DISTANCE_UPDATED);
             },
             (payload, args, ctx) => {
-                return Boolean(payload.eventDistanceUpdated.id == args.event);
+                return Boolean(payload.eventDistanceUpdated.id === args.event);
             }
         )
     }

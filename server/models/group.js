@@ -41,8 +41,7 @@ const add = async ({ name, secret, event }) => {
         name: name.trim(),
         secret: secret ? secret.trim() : crypto.randomBytes(3).toString('hex'),
         event,
-        distance: 0,
-        eventDistanceIncrement: 0
+        distance: 0
     };
 
     // name must be specified

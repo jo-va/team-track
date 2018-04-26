@@ -110,30 +110,22 @@ const move = async (id, latitude, longitude) => {
     const increment = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
 
     if (increment > 0) {
-        const result = await r.table('groups').get(participant.group).update(group => {
-            return r.branch(
-                // check if the threshold is reached and if we are the first to reach it
-                group('eventDistanceIncrement').ge(process.env.EVENT_DISTANCE_UPDATE_THRESHOLD) &&
-                group('eventLocked').default(false).eq(false),
-                {
-                    distance: group('distance').add(increment).default(0),
-                    eventDistanceIncrement: increment,
-                    eventLocked: true
-                },
-                {
-                    distance: group('distance').add(increment).default(0),
-                    eventDistanceIncrement: group('eventDistanceIncrement').add(increment).default(0),
-                    eventLocked: false
-                }
-            );
+        const result = await r.table('groups').get(participant.group).update({
+            distance: r.row('distance').default(0).add(increment),
+            distanceIncrement: r.branch(
+                r.row('distanceIncrement').default(0).add(increment).gt(5),
+                0,
+                r.row('distanceIncrement').default(0).add(increment)
+            )
         }, {
             returnChanges: 'always'
         });
 
         const changes = result.changes[0];
-        if (changes.new_val.eventLocked === true) {
+        if (changes.new_val.distanceIncrement === 0) {
+            console.log(`> Adding ${changes.old_val.distanceIncrement + increment} km to the event`);
             await r.table('events').get(participant.event).update({
-                distance: r.row('distance').add(changes.old_val.eventDistanceIncrement)
+                distance: r.row('distance').add(changes.old_val.distanceIncrement + increment)
             });
         }
     }
@@ -142,7 +134,7 @@ const move = async (id, latitude, longitude) => {
         state: 'active',
         longitude,
         latitude,
-        distance: r.row('distance').add(increment).default(0)
+        distance: r.row('distance').default(0).add(increment)
     }, { returnChanges: 'always' });
 
     return result.changes[0].new_val;
