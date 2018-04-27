@@ -201,7 +201,7 @@ class Join extends React.Component {
             >
                 <View style={styles.headerContainer}>
                     <Icon style={styles.headerIcon} name='location-pin' color='#ffcd13' size={40} />
-                    <Text style={styles.headerTitle}>{applyLetterSpacing('TEAM TRACKER', 2)}</Text>
+                    <Text style={styles.headerTitle}>{applyLetterSpacing('TEAM TRACK', 2)}</Text>
                     <Text style={styles.headerDescription}>Choose a username and enter your team's password to join and start the tracking</Text>
                 </View>
                 {this.state.joinErrors.map((error, i) => <Text style={styles.error} key={i}>{error}</Text>)}
