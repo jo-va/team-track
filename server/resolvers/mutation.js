@@ -6,24 +6,24 @@ import { PARTICIPANT_JOINED } from './subscription';
 import { mustBeAuthenticated } from './security';
 
 export const Mutation = {
-    addGroup: async (root, group, ctx) => {
+    createGroup: async (root, group, ctx) => {
         mustBeAuthenticated(ctx, ctx.user);
         if (!ctx.user.events || ctx.user.events.length === 0 || !(ctx.user.events.indexOf(group.event) > -1)) {
             throw new Error('Unauthorized');
         }
-        return Group.add(group, ctx.user.id);
+        return Group.create(group, ctx.user.id);
     },
 
-    addEvent: async (root, event, ctx) => {
+    createEvent: async (root, event, ctx) => {
         mustBeAuthenticated(ctx, ctx.user);
-        const newEvent = await Event.add(event, ctx.user.id);
+        const newEvent = await Event.create(event, ctx.user.id);
         ctx.user = await User.addEvent(ctx.user.id, newEvent.id);
         return newEvent;
     },
 
     signup: async (root, { username, password }, ctx) => {
         const hash = await bcrypt.hash(password, 12);
-        const user = await User.add({ username, password: hash });
+        const user = await User.create({ username, password: hash });
 
         user.jwt = jwt.sign(
             {
@@ -66,7 +66,7 @@ export const Mutation = {
     },
 
     join: async (root, { username, secret }, ctx) => {
-        const participant = await Participant.add(username, secret);
+        const participant = await Participant.create(username, secret);
 
         participant.jwt = jwt.sign(
             {

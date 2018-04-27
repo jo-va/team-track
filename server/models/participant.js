@@ -36,7 +36,7 @@ const findAllByGroupId = async (groupId) => {
     }
 };
 
-const add = async (username, secret) => {
+const create = async (username, secret) => {
     // The secret token for the group must be valid
     const group = await Group.findBySecret(secret);
     if (!group) {
@@ -169,7 +169,7 @@ export const Participant = {
     findById,
     findByIdAndVersion,
     findAllByGroupId,
-    add,
+    create,
     move,
     onParticipantJoined
 };

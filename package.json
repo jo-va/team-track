@@ -1,5 +1,5 @@
 {
-    "name": "test",
+    "name": "teamtrack",
     "version": "1.0.0",
     "main": "index.js",
     "license": "MIT",
@@ -7,13 +7,13 @@
         "dev": "nodemon server/server.js",
         "build": "babel server -d build",
         "start": "node build/server.js",
-        "deploy:dev": "docker-compose up --build",
+        "deploy:dev": "docker-compose up",
+        "deploy:dev:build": "docker-compose up --build",
         "deploy:prod": "yarn build && ./deploy.sh"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.18.2",
-        "cors": "^2.8.4",
         "dotenv": "^5.0.1",
         "express": "^4.16.3",
         "express-jwt": "^5.3.1",
@@ -25,7 +25,8 @@
         "lodash": "^4.17.5",
         "morgan": "^1.9.0",
         "rethinkdbdash": "^2.3.31",
-        "subscriptions-transport-ws": "^0.9.7"
+        "subscriptions-transport-ws": "^0.9.7",
+        "url": "^0.11.0"
     },
     "devDependencies": {
         "babel-cli": "^6.26.0",

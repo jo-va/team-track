@@ -18,7 +18,7 @@ const findAllById = async (ids) => {
     return r.table('events').getAll(r.args(ids));
 }
 
-const add = async ({ name, latitude, longitude, radius}) => {
+const create = async ({ name, latitude, longitude, radius}) => {
     const event = {
         name: name.trim(),
         latitude: latitude || null,
@@ -75,6 +75,6 @@ export const Event = {
     findAll,
     findById,
     findAllById,
-    add,
+    create,
     onDistanceUpdate
 };

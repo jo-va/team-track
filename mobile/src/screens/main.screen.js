@@ -151,18 +151,21 @@ class Main extends React.Component {
                         </Button>
 
                         <Meter
+                            style={{ container: { flex: 1.5 }, value: { fontSize: 70 } }}
                             value={this.formatDistance(participant.distance, 5)}
                             title={participant.username}
                             label='DISTANCE (km)'
                         />
 
                         <Meter
+                            style={{ container: { flex: 1 } }}
                             value={this.formatDistance(participant.group.distance, 1)}
                             title={participant.group.name}
                             label='DISTANCE (km)'
                         />
 
                         <Meter
+                            style={{ container: { flex: 1 } }}
                             value={this.formatDistance(participant.event.distance)}
                             title={participant.event.name}
                             label='DISTANCE (km)'

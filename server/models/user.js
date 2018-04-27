@@ -42,7 +42,7 @@ const addEvent = async (userId, eventId) => {
     return result.changes[0].new_val;
 }
 
-const add = async ({ username, password }) => {
+const create = async ({ username, password }) => {
     const user = {
         username: username.trim(),
         password,
@@ -83,5 +83,5 @@ export const User = {
     findByIdAndVersion,
     findByUsername,
     addEvent,
-    add
+    create
 };

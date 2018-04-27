@@ -1,9 +1,12 @@
 import rethinkdbdash from 'rethinkdbdash';
+import { parse } from 'url';
+
+const { hostname, port, path } = parse(process.env.RETHINKDB_URL);
 
 const config = {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    db: process.env.DB_NAME
+    host: hostname,
+    port,
+    db: path.slice(1)
 };
 
 let driver = null;

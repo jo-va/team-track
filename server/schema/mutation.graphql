@@ -1,8 +1,8 @@
 type Mutation {
     # Create a new group (admin only)
-    addGroup(name: String!, event: ID!, secret: String): Group
+    createGroup(name: String!, event: ID!, secret: String): Group
     # Create a new event (admin only)
-    addEvent(name: String!, latitude: Float, longitude: Float, radius: Float): Event
+    createEvent(name: String!, latitude: Float, longitude: Float, radius: Float): Event
     # Start the event
     #startEvent(id: ID!): Event
     # Stop the event

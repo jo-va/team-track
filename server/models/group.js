@@ -39,7 +39,7 @@ const findBySecret = async (secret) => {
         .default(null);
 };
 
-const add = async ({ name, secret, event }) => {
+const create = async ({ name, secret, event }) => {
     const group = {
         name: name.trim(),
         secret: secret ? secret.trim() : crypto.randomBytes(3).toString('hex'),
@@ -106,6 +106,6 @@ export const Group = {
     findById,
     findAll,
     findBySecret,
-    add,
+    create,
     onDistanceUpdate,
 };

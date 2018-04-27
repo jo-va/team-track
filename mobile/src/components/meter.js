@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
         borderBottomColor: '#d6d7da',
     },
     value: {
-        fontSize: 50,
+        fontSize: 45,
         fontWeight: 'bold',
         textAlign: 'center'
     },
@@ -30,13 +30,18 @@ const styles = StyleSheet.create({
 });
 
 export const Meter = props => {
-    const { value, title, label } = props;
+    const { value, title, label, style } = props;
+
+    const containerStyle = style ? style.container : null;
+    const titleStyle = style ? style.title : null;
+    const labelStyle = style ? style.label : null;
+    const valueStyle = style ? style.value : null;
 
     return (
-        <View style={styles.container}>
-            {!isBlank(title) && <Text style={styles.title}>{title}</Text>}
-            <Text style={styles.value}>{value}</Text>
-            {!isBlank(label) && <Text style={styles.label}>{label}</Text>}
+        <View style={[styles.container, containerStyle]}>
+            {!isBlank(title) && <Text style={[styles.title, titleStyle]}>{title}</Text>}
+            <Text style={[styles.value, valueStyle]}>{value}</Text>
+            {!isBlank(label) && <Text style={[styles.label, labelStyle]}>{label}</Text>}
         </View>
     );
 };
