@@ -41,7 +41,7 @@ const reducer = persistCombineReducers(config, {
     auth
 });
 
-const store = createStore(
+export const store = createStore(
     reducer,
     {}, // initial state
     composeWithDevTools(
@@ -75,9 +75,9 @@ const authLink = setContext((req, previousContext) => {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
     let shouldLogout = false;
     if (graphQLErrors) {
-        console.error({ graphQLErrors });
-        graphQLErrors.forEach(({ message, locations, path }) => {1651
-            console.error({ message, locations, path});
+        console.log({ graphQLErrors });
+        graphQLErrors.forEach(({ message, locations, path }) => {
+            console.log({ message, locations, path});
             if (message === 'Unauthorized') {
                 shouldLogout = true;
             }
@@ -88,10 +88,10 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         }
     }
     if (networkError) {
-        console.error('[Network error]:');
-        console.error({ networkError });
+        console.log('[Network error]:');
+        console.log({ networkError });
         if (networkError.statusCode === 401) {
-            logout();
+            store.dispatch(logout());
         }
     }
 });

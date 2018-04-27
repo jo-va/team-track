@@ -99,6 +99,7 @@ class Main extends React.Component {
         }
         if (!this.reconnected) {
             this.reconnected = wsClient.onReconnected(() => {
+                console.log('> Refetching');
                 this.props.refetch();
             }, this);
         }

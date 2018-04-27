@@ -31,8 +31,8 @@ export const startTracking = () => dispatch => {
                     });
                 }
             }).catch(err => {
-                console.error('> Move mutation error');
-                console.error(err);
+                console.log('> Move mutation error');
+                console.log(err);
             });
 
             return dispatch({ type: POSITION, position });
@@ -46,7 +46,7 @@ export const startTracking = () => dispatch => {
 
             return dispatch({ type: TRACKING_ERROR, error: error.message });
         },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 5 },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 0 },
     );
 
     Toast.show({

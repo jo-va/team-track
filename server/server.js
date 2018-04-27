@@ -26,12 +26,26 @@ const executableSchema = makeExecutableSchema({
     resolvers
 });
 
-const getUserOrParticipant = async (decoded, jwt) => ({
-    user: decoded && decoded.type === 'user' ?
-        { ...await User.findByIdAndVersion(decoded.id, decoded.version), jwt } : null,
-    participant: decoded && decoded.type === 'participant' ?
-        { ...await Participant.findByIdAndVersion(decoded.id, decoded.version), jwt } : null,
-});
+const getUserOrParticipant = async (decoded, jwt) => {
+    let result = {
+        user: null,
+        participant: null
+    };
+
+    if (decoded && decoded.type === 'user') {
+        result.user = await User.findByIdAndVersion(decoded.id, decoded.version);
+    } else if (decoded && decoded.type === 'participant') {
+        result.participant = await Participant.findByIdAndVersion(decoded.id, decoded.version);
+    }
+
+    if (result.user) {
+        result.user.jwt = jwt;
+    } else if (result.participant) {
+        result.participant.jwt = jwt;
+    }
+
+    return result;
+};
 
 const app = express();
 
@@ -48,7 +62,7 @@ app.use('/graphql', bodyParser.json(), jwt({
             return req.jwt;
         }
         return null;
-      }
+    }
 }), graphqlExpress(async (req) => ({
     schema: executableSchema,
     context: {

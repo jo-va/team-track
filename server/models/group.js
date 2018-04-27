@@ -16,6 +16,9 @@ const findAllByEventId = async (eventId) => {
 };
 
 const findById = async (id) => {
+    if (!id) {
+        return null;
+    }
     const r = getRethink();
     return r.table('groups').get(id).default(null);
 };
@@ -51,8 +54,6 @@ const add = async ({ name, secret, event }) => {
 
     // The name must be unique
     let duplicate = await findByName(group.name);
-    console.log(duplicate);
-    console.log(group);
     if (duplicate) {
         throw new Error('A group already exists with this name');
     }
@@ -92,7 +93,7 @@ const onDistanceUpdate = handler => {
         .then(cursor => {
             cursor.each(async (err, record) => {
                 if (err) {
-                    console.error(err);
+                    console.error('Group.onDistanceUpdate Error: ', err);
                 } else {
                     handler(record.new_val);
                 }

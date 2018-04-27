@@ -63,3 +63,5 @@ To generate an APK for android:
 ```bash
 $ cd android && ./gradlew assembleRelease
 ```
+
+Use of [react-native-debugger](https://github.com/jhen0409/react-native-debugger) is suggested.

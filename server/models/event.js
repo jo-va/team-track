@@ -6,6 +6,9 @@ const findAll = async () => {
 };
 
 const findById = async (id) => {
+    if (!id) {
+        return null;
+    }
     const r = getRethink();
     return r.table('events').get(id).default(null);
 };
@@ -60,7 +63,7 @@ const onDistanceUpdate = handler => {
         .then(cursor => {
             cursor.each(async (err, record) => {
                 if (err) {
-                    console.error(err);
+                    console.error('Event.onDistanceUpdate Error: ', err);
                 } else {
                     handler(record.new_val);
                 }

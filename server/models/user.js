@@ -6,11 +6,17 @@ const findAll = async () => {
 };
 
 const findById = async (id) => {
+    if (!id) {
+        return null;
+    }
     const r = getRethink();
     return r.table('users').get(id).default(null);
 };
 
 const findByIdAndVersion = async (id, version) => {
+    if (!id) {
+        return null;
+    }
     const r = getRethink();
     return r.table('users')
         .filter({ id, version })

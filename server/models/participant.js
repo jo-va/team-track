@@ -9,11 +9,17 @@ const findAll = async () => {
 };
 
 const findById = async (id) => {
+    if (!id) {
+        return null;
+    }
     const r = getRethink();
     return r.table('participants').get(id).default(null);
 };
 
 const findByIdAndVersion = async (id, version) => {
+    if (!id) {
+        return null;
+    }
     const r = getRethink();
     return r.table('participants')
         .filter({ id, version })
@@ -55,7 +61,6 @@ const add = async (username, secret) => {
         .filter(r.row('username').downcase().eq(participant.username.toLowerCase()).and(r.row('group').eq(group.id)))
         .nth(0)
         .default(null);
-    console.log(participantFound)
     
     if (participantFound) {
         throw new Error(`User ${participant.username} already exists`);
@@ -151,7 +156,7 @@ const onParticipantJoined = handler => {
         .then(cursor => {
             cursor.each(async (err, record) => {
                 if (err) {
-                    console.error(err);
+                    console.error('onParticipantJoined Error: ', err);
                 } else {
                     handler(record.new_val);
                 }
