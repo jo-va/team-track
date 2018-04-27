@@ -32,7 +32,7 @@ Transpilation is provided by [babel](https://github.com/babel/babel).
 TeamTrack's backend is fully dockerized, from dev to prod.
 You will need to install [yarn](https://yarnpkg.com/) which can be installed by running `npm install -g yarn`.
 
-TeamTrack requires Node.js >=8.5.0 (we're using 8.5.0 in development).
+TeamTrack requires Node.js >=8.5.0 (I'm using 8.5.0 in development).
 and it also depends on [RethinkDB](https://rethinkdb.com/).
 However those dependencies are hidden via docker.
 
