@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Text, Icon, Footer, FooterTab } from "native-base";
+import { Button, Text, Icon, Footer, FooterTab } from 'native-base';
 import {
     NavigationActions,
     addNavigationHelpers,
@@ -12,7 +12,6 @@ import {
     createReactNavigationReduxMiddleware
 } from 'react-navigation-redux-helpers';
 import { connect } from 'react-redux';
-import { graphql, compose } from 'react-apollo';
 import { REHYDRATE } from 'redux-persist';
 
 import Main from './screens/main.screen';
@@ -20,8 +19,6 @@ import Map from './screens/map.screen';
 import Join from './screens/join.screen';
 
 import { LOGOUT } from './actions/constants';
-import CURRENT_PARTICIPANT_QUERY from './graphql/current-participant.query';
-import ParticipantPropTypes from './graphql/participant.types';
 
 // tabs in main screen
 const MainScreenNavigation = TabNavigator({
@@ -108,7 +105,6 @@ export const navigationReducer = (state = initialState, action) => {
             break;
     }
 
-    // Simply return the original `state` if `nextState` is null or undefined
     return nextState || state;
 };
 
@@ -137,9 +133,7 @@ AppWithNavigationState.propTypes = {
         jwt: PropTypes.string
     }),
     dispatch: PropTypes.func.isRequired,
-    nav: PropTypes.object.isRequired,
-    refetch: PropTypes.func,
-    participant: ParticipantPropTypes
+    nav: PropTypes.object.isRequired
 };
 
 const mapStateToProps = ({ auth, nav }) => ({
@@ -147,16 +141,4 @@ const mapStateToProps = ({ auth, nav }) => ({
     nav
 });
 
-const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
-    skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
-    props: ({ data: { loading, refetch, currentParticipant } }) => ({
-        loading,
-        refetch,
-        participant: currentParticipant
-    })
-});
-
-export default compose(
-    connect(mapStateToProps),
-    currentParticipantQuery
-)(AppWithNavigationState);
+export default connect(mapStateToProps)(AppWithNavigationState);

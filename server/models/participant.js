@@ -108,12 +108,13 @@ const move = async (id, latitude, longitude) => {
 
     // Calculate displacement
     const increment = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
+    const threshold = 5;
 
     if (increment > 0) {
         const result = await r.table('groups').get(participant.group).update({
             distance: r.row('distance').default(0).add(increment),
             distanceIncrement: r.branch(
-                r.row('distanceIncrement').default(0).add(increment).gt(5),
+                r.row('distanceIncrement').default(0).add(increment).gt(threshold),
                 0,
                 r.row('distanceIncrement').default(0).add(increment)
             )

@@ -75,9 +75,9 @@ const authLink = setContext((req, previousContext) => {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
     let shouldLogout = false;
     if (graphQLErrors) {
-        console.log({ graphQLErrors });
+        console.error({ graphQLErrors });
         graphQLErrors.forEach(({ message, locations, path }) => {1651
-            console.log({ message, locations, path});
+            console.error({ message, locations, path});
             if (message === 'Unauthorized') {
                 shouldLogout = true;
             }
@@ -88,8 +88,8 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         }
     }
     if (networkError) {
-        console.log('[Network error]:');
-        console.log({ networkError });
+        console.error('[Network error]:');
+        console.error({ networkError });
         if (networkError.statusCode === 401) {
             logout();
         }

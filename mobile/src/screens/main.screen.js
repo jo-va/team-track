@@ -49,7 +49,7 @@ class Main extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (!this.groupDistanceSubscription) {
+        if (!this.groupDistanceSubscription && nextProps.participant) {
             this.groupDistanceSubscription = this.props.subscribeToMore({
                 document: GROUP_DISTANCE_UPDATED_SUBSCRIPTION,
                 variables: {
@@ -73,7 +73,7 @@ class Main extends React.Component {
                 }
             });
         }
-        if (!this.eventDistanceSubscription) {
+        if (!this.eventDistanceSubscription && nextProps.participant) {
             this.eventDistanceSubscription = this.props.subscribeToMore({
                 document: EVENT_DISTANCE_UPDATED_SUBSCRIPTION,
                 variables: {
@@ -134,7 +134,6 @@ class Main extends React.Component {
                 </Container>
             );
         }
-        console.log(participant);
 
         return (
             <Container>
@@ -151,7 +150,7 @@ class Main extends React.Component {
                         </Button>
 
                         <Meter
-                            value={this.formatDistance(participant.distance, 2)}
+                            value={this.formatDistance(participant.distance, 5)}
                             title={participant.username}
                             label='DISTANCE (km)'
                         />

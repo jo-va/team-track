@@ -1,19 +1,59 @@
 import { store } from '../app';
+import { Toast } from 'native-base';
+import { client } from '../app';
 import {
     START_TRACKING,
     STOP_TRACKING,
     TRACKING_ERROR,
     POSITION
 } from './constants';
+import MOVE_MUTATION from '../graphql/move.mutation';
+import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 
 let watchId = null;
 
 export const startTracking = () => dispatch => {
     watchId = navigator.geolocation.watchPosition(
-        (position) => dispatch({ type: POSITION, position }),
-        (error) => dispatch({ type: TRACKING_ERROR, error: error.message }),
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 0 },
+        (position) => {
+            client.mutate({
+                mutation: MOVE_MUTATION,
+                variables: {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude
+                },
+                update: (store, { data: { move } }) => {
+                    const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
+                    data.currentParticipant.distance = move.distance;
+                    data.currentParticipant.state = move.state;
+                    store.writeQuery({
+                        query: CURRENT_PARTICIPANT_QUERY,
+                        data
+                    });
+                }
+            }).catch(err => {
+                console.error('> Move mutation error');
+                console.error(err);
+            });
+
+            return dispatch({ type: POSITION, position });
+        },
+        (error) => {
+            Toast.show({
+                text: `Tracking error: ${tracking.error}`,
+                type: 'danger',
+                duration: 10000
+            });
+
+            return dispatch({ type: TRACKING_ERROR, error: error.message });
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 5 },
     );
+
+    Toast.show({
+        text: 'Tracking started',
+        type: 'success'
+    });
+
     return dispatch({ type: START_TRACKING });
 };
 
@@ -21,6 +61,11 @@ export const stopTracking = () => {
     navigator.geolocation.clearWatch(watchId);
     navigator.geolocation.stopObserving();
     watchId = null;
+
+    Toast.show({
+        text: 'Tracking stopped'
+    });
+
     return { type: STOP_TRACKING };
 };
 

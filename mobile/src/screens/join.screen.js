@@ -124,7 +124,7 @@ class Join extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.auth.jwt) {
+        if (nextProps.auth && nextProps.auth.jwt) {
             nextProps.navigation.goBack();
         }
     }
