@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     }
 });
 
-const ACTION_TIMER = 1000;
+const ACTION_TIMER = 1500;
 
 class PlayToggle extends React.Component {
     constructor(props) {
@@ -64,6 +64,10 @@ class PlayToggle extends React.Component {
         this.state.pressAction.addListener(v => this.value = v.value);
     }
 
+    componentWillUnmount() {
+        this.state.pressAction.removeAllListeners();
+    }
+
     handlePressIn() {
         Animated.timing(this.state.pressAction, {
             duration: ACTION_TIMER,
@@ -73,7 +77,7 @@ class PlayToggle extends React.Component {
 
     handlePressOut() {
         Animated.timing(this.state.pressAction, {
-            duration: 100,
+            duration: 200,
             toValue: 0
         }).start();
     }
