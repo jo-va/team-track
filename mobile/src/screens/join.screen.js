@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontSize: 17,
-        lineHeight: 20,
+        lineHeight: 25,
         fontWeight: 'normal',
         marginVertical: 10
     },
@@ -201,16 +201,16 @@ class Join extends React.Component {
                 enableOnAndroid={true}
             >
                 <View style={styles.headerContainer}>
-                    <Icon style={styles.headerIcon} name='location-pin' color={theme.secondaryColor} size={40} />
+                    <Icon style={styles.headerIcon} name='location-pin' color={theme.secondaryColor} size={50} />
                     <Text style={styles.headerTitle}>{applyLetterSpacing('TEAM TRACK', 2)}</Text>
-                    <Text style={styles.headerDescription}>Choose a username and enter your team's password to join and start the tracking</Text>
+                    <Text style={styles.headerDescription}>Enter your name and your team's password to join the event!</Text>
                 </View>
                 {this.state.joinErrors.map((error, i) => <Text style={styles.error} key={i}>{error}</Text>)}
                 <View style={styles.formContainer}>
                     <FormInput
                         refInput={input => (this.usernameInput = input)}
                         icon='user'
-                        placeholder='Username'
+                        placeholder='Your Name'
                         returnKeyType='next'
                         value={this.state.username}
                         errorMessage={this.state.usernameError}

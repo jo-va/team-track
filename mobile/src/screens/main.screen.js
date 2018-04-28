@@ -63,6 +63,7 @@ class Main extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (!this.groupDistanceSubscription && nextProps.participant && this.props.subscribeToMore) {
+            console.log('> Group distance subscription');
             this.groupDistanceSubscription = this.props.subscribeToMore({
                 document: GROUP_DISTANCE_UPDATED_SUBSCRIPTION,
                 variables: {
@@ -87,6 +88,7 @@ class Main extends React.Component {
             });
         }
         if (!this.eventDistanceSubscription && nextProps.participant && this.props.subscribeToMore) {
+            console.log('> Event distance subscription');
             this.eventDistanceSubscription = this.props.subscribeToMore({
                 document: EVENT_DISTANCE_UPDATED_SUBSCRIPTION,
                 variables: {
@@ -158,9 +160,9 @@ class Main extends React.Component {
                         <Meter
                             style={{
                                 container: {
-                                    flex: 1.5
+                                    flex: 2
                                 }, value: {
-                                    fontSize: 70,
+                                    fontSize: 80,
                                     color: tracking.isTracking ? theme.secondaryColor : '#444'
                                 }, title: {
                                     fontSize: 25
@@ -171,10 +173,18 @@ class Main extends React.Component {
                             label='DISTANCE (km)'
                         />
 
+                        <PlayToggle
+                            style={{ container: { flex: 0.6 } }}
+                            onPress={this.toggleGeolocation}
+                            pressed={tracking.isTracking}
+                        />
+
                         <Meter
                             style={{
                                 container: {
                                     flex: 1,
+                                }, title: {
+                                    fontSize: 15
                                 }
                             }}
                             value={this.formatDistance(participant.group.distance, 1)}
@@ -187,17 +197,13 @@ class Main extends React.Component {
                                 container: {
                                     flex: 1,
                                     borderBottomWidth: 0
+                                }, title: {
+                                   fontSize: 15
                                 }
                             }}
                             value={this.formatDistance(participant.event.distance)}
                             title={participant.event.name}
                             label='DISTANCE (km)'
-                        />
-
-                        <PlayToggle
-                            style={{ container: { flex: 0.6 } }}
-                            onPress={this.toggleGeolocation}
-                            pressed={tracking.isTracking}
                         />
 
                         <Button

@@ -26,9 +26,9 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     text: {
-        fontSize: 27,
+        fontSize: 25,
         color: 'white',
-        fontWeight: 'bold'
+        fontWeight: 'normal'
     },
     bgFill: {
         position: 'absolute',
@@ -115,7 +115,7 @@ class PlayToggle extends React.Component {
                 >
                     <View style={styles.container} onLayout={this.getButtonWidthLayout}>
                         <Animated.View style={[styles.bgFill, this.getProgressStyles()]} />
-                        <Text style={styles.text}>{pressed ? 'Hold to stop' : 'Hold to start'}</Text>
+                        <Text style={styles.text}>{pressed ? 'Hold to stop/pause' : 'Hold to start'}</Text>
                     </View>
                 </TouchableHighlight>
             </View>

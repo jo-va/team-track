@@ -26,7 +26,7 @@ import auth from './reducers/auth.reducer';
 import tracking from './reducers/tracking.reducer';
 import { logout } from './actions/auth.actions';
 
-const URL = 'http://teamtrack.localtunnel.me:3000/graphql';
+const URL = '192.168.0.183:3000';
 
 const config = {
     key: 'root',
@@ -50,13 +50,11 @@ export const store = createStore(
 );
 
 const persistor = persistStore(store);
-
 const cache = new ReduxCache({ store });
-
 const reduxLink = new ReduxLink(store);
 
 const httpLink = new HttpLink({
-    uri: URL
+    uri: `http://${URL}/graphql`
 });
 
 const authLink = setContext((req, previousContext) => {
@@ -100,7 +98,7 @@ export const wsClient = new SubscriptionClient(`ws://${URL}/subscriptions`, {
     lazy: true,
     reconnect: true,
     reconnectionAttempts: 10,
-    timeout: 3000,
+    timeout: 5000,
     connectionParams() {
         return { jwt: store.getState().auth.jwt };
     }
@@ -109,7 +107,7 @@ export const wsClient = new SubscriptionClient(`ws://${URL}/subscriptions`, {
 wsClient.onConnected(() => console.log('** Connected'));
 wsClient.onReconnected(() => console.log('** Reconnected'));
 wsClient.onDisconnected(() => console.log('** Disconnected'));
-wsClient.onError(() => console.log('** Error'));
+wsClient.onError((e) => console.log('** Error', e));
 
 const webSocketLink = new WebSocketLink(wsClient);
 
