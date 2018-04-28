@@ -47,13 +47,12 @@ class PlayToggle extends React.Component {
 
         this.state = {
             pressAction: new Animated.Value(0),
-            complete: false,
             width: 0
         }
 
         this.handlePressIn = this.handlePressIn.bind(this);
         this.handlePressOut = this.handlePressOut.bind(this);
-        this.animationActionComplete = this.animationActionComplete.bind(this);
+        this.animationComplete = this.animationComplete.bind(this);
         this.getButtonWidthLayout = this.getButtonWidthLayout.bind(this);
         this.getProgressStyles = this.getProgressStyles.bind(this);
     }
@@ -72,7 +71,7 @@ class PlayToggle extends React.Component {
         Animated.timing(this.state.pressAction, {
             duration: ACTION_TIMER,
             toValue: 1
-        }).start(this.animationActionComplete);
+        }).start(this.animationComplete);
     }
 
     handlePressOut() {
@@ -82,11 +81,10 @@ class PlayToggle extends React.Component {
         }).start();
     }
 
-    animationActionComplete() {
+    animationComplete() {
         if (this.value === 1) {
             this.props.onPress();
         }
-        this.setState({ complete: this.value === 1 });
     }
 
     getButtonWidthLayout(e) {
@@ -101,14 +99,14 @@ class PlayToggle extends React.Component {
 
         return { width };
     }
-    
+
     render() {
         const { pressed, style} = this.props;
 
         return (
             <View style={[styles.container, style && style.container]}>
                 <TouchableHighlight
-                    underlayColor={(pressed ? theme.secondaryColor : theme.mainColor) + 'cc'}
+                    underlayColor={(pressed ? theme.secondaryColor : theme.mainColor) + 'dd'}
                     onPressIn={this.handlePressIn}
                     onPressOut={this.handlePressOut}
                     style={[styles.button, pressed && styles.buttonPressed, style && style.button]}
