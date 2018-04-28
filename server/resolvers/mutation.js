@@ -4,6 +4,7 @@ import { User, Participant, Group, Event } from '../models';
 import pubsub from '../pubsub';
 import { PARTICIPANT_JOINED } from './subscription';
 import { mustBeAuthenticated } from './security';
+import getPubSub from '../pubsub';
 
 export const Mutation = {
     createGroup: async (root, group, ctx) => {
@@ -80,7 +81,7 @@ export const Mutation = {
 
         ctx.participant = participant;
 
-        pubsub.publish(PARTICIPANT_JOINED, { [PARTICIPANT_JOINED]: participant });
+        getPubSub().publish(PARTICIPANT_JOINED, { [PARTICIPANT_JOINED]: participant });
 
         return participant;
     },

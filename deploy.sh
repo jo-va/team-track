@@ -1,2 +1,2 @@
-docker build -t relay-for-life-api .
-#docker push jova/relay-api
+docker build -t teamtrack .
+#docker push jova/teamtrack

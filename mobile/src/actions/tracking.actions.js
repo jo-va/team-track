@@ -41,7 +41,8 @@ export const startTracking = () => dispatch => {
             Toast.show({
                 text: `Tracking error: ${error.message}`,
                 type: 'danger',
-                duration: 10000
+                duration: 10000,
+                position: 'top'
             });
 
             return dispatch({ type: TRACKING_ERROR, error: error.message });
@@ -51,7 +52,7 @@ export const startTracking = () => dispatch => {
 
     Toast.show({
         text: 'Tracking started',
-        type: 'success'
+        position: 'top'
     });
 
     return dispatch({ type: START_TRACKING });
@@ -63,7 +64,8 @@ export const stopTracking = () => {
     watchId = null;
 
     Toast.show({
-        text: 'Tracking stopped'
+        text: 'Tracking stopped',
+        position: 'top'
     });
 
     return { type: STOP_TRACKING };

@@ -4,9 +4,12 @@
 // 9ad198
 // 3f51b5
 
+// '#3f51b5',
+// '#ffcd13',
+
 const theme = {
-    mainColor: '#3f51b5',
-    secondaryColor: '#ffcd13',
+    mainColor: '#5bc0de',
+    secondaryColor: '#f0ad4e',
     errorColor: '#ffcd13'
 };
 

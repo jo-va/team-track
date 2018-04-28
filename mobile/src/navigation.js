@@ -28,7 +28,8 @@ const MainScreenNavigation = TabNavigator({
     initialRouteName: 'Main',
     tabBarPosition: 'bottom',
     tabBarComponent: props => {
-        return (
+        return null;
+        /*return (
             <Footer>
                 <FooterTab>
                     <Button
@@ -46,8 +47,8 @@ const MainScreenNavigation = TabNavigator({
                         <Text>Map</Text>
                     </Button>
                 </FooterTab>
-            </Footer>                                     
-        );
+            </Footer>                                 
+        );*/
     }
 });
 

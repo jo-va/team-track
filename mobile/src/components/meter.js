@@ -16,21 +16,23 @@ const styles = StyleSheet.create({
     value: {
         fontSize: 45,
         fontWeight: 'bold',
-        textAlign: 'center'
+        textAlign: 'center',
+        color: '#444'
     },
     title: {
         fontSize: 20,
+        fontWeight: 'bold',
         textAlign: 'center',
-        color: '#222'
+        
     },
     label: {
         fontSize: 12,
         textAlign: 'center',
+        color: '#999'
     }
 });
 
-export const Meter = props => {
-    const { value, title, label, style } = props;
+export const Meter = ({ value, title, label, style }) => {
 
     const containerStyle = style ? style.container : null;
     const titleStyle = style ? style.title : null;

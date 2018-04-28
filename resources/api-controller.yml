@@ -12,7 +12,7 @@ spec:
         name: api
     spec:
       containers:
-      - image: gcr.io/relay-for-life-api/api
+      - image: gcr.io/teamtrack/api
         name: api
         ports:
         - containerPort: 3000

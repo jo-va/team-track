@@ -9,11 +9,13 @@ services:
             - 29015:29015
         volumes:
             - rdb-data:/data
-        command: rethinkdb --bind all --directory /data 
+        command: rethinkdb --bind all --directory /data
         restart: always
 
     redis:
-        image: redis
+        image: redis:alpine
+        ports:
+            - 6379:6379
 
     api:
         image: api

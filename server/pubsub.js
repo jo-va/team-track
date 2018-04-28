@@ -1,5 +1,4 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions';
-import * as Redis from 'ioredis';
 
 let pubsub;
 

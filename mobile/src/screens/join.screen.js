@@ -36,13 +36,14 @@ const styles = StyleSheet.create({
     headerTitle: {
         color: 'white',
         fontSize: 25,
-        fontWeight: 'normal',
+        fontWeight: 'bold',
         marginVertical: 20
     },
     headerDescription: {
         color: 'white',
         textAlign: 'center',
-        fontSize: 15,
+        fontSize: 17,
+        lineHeight: 20,
         fontWeight: 'normal',
         marginVertical: 10
     },
@@ -53,9 +54,9 @@ const styles = StyleSheet.create({
     },
     joinButton: {
         height: 45,
-        backgroundColor: '#80d050',
+        backgroundColor: theme.secondaryColor,
         borderWidth: 2,
-        borderColor: '#80d050',
+        borderColor: theme.secondaryColor,
         borderRadius: 30,
         marginTop: 20
     },
@@ -223,7 +224,7 @@ class Join extends React.Component {
                     <FormInput
                         refInput={input => (this.secretInput = input)}
                         icon='lock'          
-                        placeholder='Group Password'
+                        placeholder='Team Password'
                         secureTextEntry={true}
                         returnKeyType='done'
                         value={this.state.secret}

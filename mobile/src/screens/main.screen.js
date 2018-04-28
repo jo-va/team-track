@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { graphql, compose } from 'react-apollo';
 import Spinner from '../components/spinner';
 import Meter from '../components/meter';
+import PlayToggle from '../components/play-toggle';
 import { logout } from '../actions/auth.actions';
 import { wsClient } from '../app';
 import GROUP_DISTANCE_UPDATED_SUBSCRIPTION from '../graphql/group-distance.subscription';
@@ -19,6 +20,7 @@ import {
     stopTracking,
     toggleTracking
 } from '../actions/tracking.actions';
+import theme from '../theme';
 
 const styles = StyleSheet.create({
     container: {
@@ -122,6 +124,7 @@ class Main extends React.Component {
     }
 
     logout() {
+        this.unsubscribe();
         this.props.dispatch(logout());
     }
 
@@ -152,35 +155,47 @@ class Main extends React.Component {
             <Container>
                 <Content contentContainerStyle={{flex: 1}}>
                     <View style={styles.container}>
-                        <Button
-                            onPress={this.toggleGeolocation}
-                            large
-                            full
-                            info={tracking.isTracking}
-                            success={!tracking.isTracking}
-                        >
-                            <Text>{tracking.isTracking ? 'Pause' : 'Start'}</Text>
-                        </Button>
-
                         <Meter
-                            style={{ container: { flex: 1.5 }, value: { fontSize: 70 } }}
+                            style={{
+                                container: {
+                                    flex: 1.5
+                                }, value: {
+                                    fontSize: 70,
+                                    color: '#f0ad4e'
+                                }
+                            }}
                             value={this.formatDistance(participant.distance, 5)}
                             title={participant.username}
                             label='DISTANCE (km)'
                         />
 
                         <Meter
-                            style={{ container: { flex: 1 } }}
+                            style={{
+                                container: {
+                                    flex: 1,
+                                }
+                            }}
                             value={this.formatDistance(participant.group.distance, 1)}
                             title={participant.group.name}
                             label='DISTANCE (km)'
                         />
 
                         <Meter
-                            style={{ container: { flex: 1 } }}
+                            style={{
+                                container: {
+                                    flex: 1,
+                                    borderBottomWidth: 0
+                                }
+                            }}
                             value={this.formatDistance(participant.event.distance)}
                             title={participant.event.name}
                             label='DISTANCE (km)'
+                        />
+
+                        <PlayToggle
+                            style={{ container: { flex: 0.6 } }}
+                            onPress={this.toggleGeolocation}
+                            pressed={tracking.isTracking}
                         />
 
                         <Button
@@ -188,7 +203,7 @@ class Main extends React.Component {
                             warning
                             transparent
                             onPress={() => this.setDebugModalVisible(true)}
-                            style={{ position: 'absolute', bottom: 10, left: 0 }}>
+                            style={{ position: 'absolute', top: 10, right: 0 }}>
                             <Icon name='bug' />
                         </Button>
 
