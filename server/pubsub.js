@@ -1,5 +1,15 @@
-import { PubSub } from 'graphql-subscriptions';
+import { RedisPubSub } from 'graphql-redis-subscriptions';
+import * as Redis from 'ioredis';
 
-export const pubsub = new PubSub();
+let pubsub;
 
-export default pubsub;
+const getPubSub = () => {
+    if (!pubsub) {
+        pubsub = new RedisPubSub({
+            connection: process.env.REDIS_URL
+        });
+    }
+    return pubsub;
+}
+
+export default getPubSub;

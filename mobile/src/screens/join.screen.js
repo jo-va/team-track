@@ -135,7 +135,7 @@ class Join extends React.Component {
 
             const { username, secret } = this.state;
 
-            this.props.join(username, secret)
+            this.props.join(username.trim(), secret.trim())
                 .then(({ data: { join: participant } }) => {
                     this.props.dispatch(setCurrentParticipant(participant));
                     this.setState({ loading: false });
@@ -161,13 +161,13 @@ class Join extends React.Component {
     }
 
     handleInputChange(field, value) {
-        this.setState({ [field]: value.trim() });
+        this.setState({ [field]: value });
     }
 
     validateFields() {
         const errors = validatejs.validate({
-            username: this.state.username,
-            secret: this.state.secret
+            username: this.state.username.trim(),
+            secret: this.state.secret.trim()
         }, CONSTRAINTS);
 
         const hasErrors = errors !== undefined && (!!errors.username || !!errors.secret);

@@ -39,7 +39,7 @@ export const startTracking = () => dispatch => {
         },
         (error) => {
             Toast.show({
-                text: `Tracking error: ${tracking.error}`,
+                text: `Tracking error: ${error.message}`,
                 type: 'danger',
                 duration: 10000
             });

@@ -113,7 +113,7 @@ const move = async (id, latitude, longitude) => {
 
     // Calculate displacement
     const increment = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
-    const threshold = 5;
+    const threshold = 1;
 
     if (increment > 0) {
         const result = await r.table('groups').get(participant.group).update({
@@ -131,7 +131,7 @@ const move = async (id, latitude, longitude) => {
         if (changes.new_val.distanceIncrement === 0) {
             console.log(`> Adding ${changes.old_val.distanceIncrement + increment} km to the event`);
             await r.table('events').get(participant.event).update({
-                distance: r.row('distance').add(changes.old_val.distanceIncrement + increment)
+                distance: r.row('distance').default(0).add(changes.old_val.distanceIncrement + increment)
             });
         }
     }

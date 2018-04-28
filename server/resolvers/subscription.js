@@ -1,6 +1,6 @@
 import { withFilter } from 'graphql-subscriptions';
 import { Participant, Group, Event } from '../models';
-import pubsub from '../pubsub';
+import getPubSub from '../pubsub';
 
 export const PARTICIPANT_JOINED = 'participantJoined';
 export const GROUP_DISTANCE_UPDATED = 'groupDistanceUpdated';
@@ -17,10 +17,10 @@ export const Subscription = {
                 if (!participantJoinedHandlerRegistered) {
                     participantJoinedHandlerRegistered = true;
                     Participant.onParticipantJoined(participant => {
-                        pubsub.publish(PARTICIPANT_JOINED, { [PARTICIPANT_JOINED]: participant });
+                        getPubSub().publish(PARTICIPANT_JOINED, { [PARTICIPANT_JOINED]: participant });
                     });
                 }
-                return pubsub.asyncIterator(PARTICIPANT_JOINED);
+                return getPubSub().asyncIterator(PARTICIPANT_JOINED);
             },
             (payload, args, ctx) => {
                 return Boolean(payload.participantJoined.group === args.group);
@@ -33,10 +33,10 @@ export const Subscription = {
                 if (!groupDistanceHandlerRegistered) {
                     groupDistanceHandlerRegistered = true;
                     Group.onDistanceUpdate(group => {
-                        pubsub.publish(GROUP_DISTANCE_UPDATED, { [GROUP_DISTANCE_UPDATED]: group });
+                        getPubSub().publish(GROUP_DISTANCE_UPDATED, { [GROUP_DISTANCE_UPDATED]: group });
                     });
                 }
-                return pubsub.asyncIterator(GROUP_DISTANCE_UPDATED);
+                return getPubSub().asyncIterator(GROUP_DISTANCE_UPDATED);
             },
             (payload, args, ctx) => {
                 return Boolean(payload.groupDistanceUpdated.id === args.group);
@@ -49,10 +49,10 @@ export const Subscription = {
                 if (!eventDistanceHandlerRegistered) {
                     eventDistanceHandlerRegistered = true;
                     Event.onDistanceUpdate(event => {
-                        pubsub.publish(EVENT_DISTANCE_UPDATED, { [EVENT_DISTANCE_UPDATED]: event });
+                        getPubSub().publish(EVENT_DISTANCE_UPDATED, { [EVENT_DISTANCE_UPDATED]: event });
                     });
                 }
-                return pubsub.asyncIterator(EVENT_DISTANCE_UPDATED);
+                return getPubSub().asyncIterator(EVENT_DISTANCE_UPDATED);
             },
             (payload, args, ctx) => {
                 return Boolean(payload.eventDistanceUpdated.id === args.event);

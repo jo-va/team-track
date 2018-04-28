@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, AppState } from 'react-native';
 import { Container, Content, Button, Header, Body, Text, Title, Icon } from 'native-base';
 import Modal from 'react-native-modal';
 import { Grid, Row } from 'react-native-easy-grid';
@@ -46,6 +46,17 @@ class Main extends React.Component {
 
         this.logout = this.logout.bind(this);
         this.toggleGeolocation = this.toggleGeolocation.bind(this);
+    }
+
+    unsubscribe() {
+        if (this.groupDistanceSubscription) {
+            this.groupDistanceSubscription();
+        }
+        if (this.eventDistanceSubscription) {
+            this.eventDistanceSubscription();
+        }
+        this.groupDistanceSubscription = null;
+        this.eventDistanceSubscription = null;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -106,6 +117,7 @@ class Main extends React.Component {
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
         this.props.dispatch(stopTracking());
     }
 
@@ -229,7 +241,7 @@ Main.propTypes = {
 
 const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
     skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
-    //options: ownProps => ({ fetchPolicy: 'cache-only' }),
+    options: ownProps => ({ fetchPolicy: 'network-only' }),
     props: ({ data: { loading, currentParticipant, refetch, subscribeToMore } }) => ({
         loading,
         participant: currentParticipant,

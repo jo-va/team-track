@@ -99,7 +99,18 @@ graphQLServer.listen(GRAPHQL_PORT, () => {
 const subscriptionServer = SubscriptionServer.create({
     schema: executableSchema,
     execute,
-    subscribe
+    subscribe,
+    onConnect: async (params, socket, ctx) => {
+        console.log('** Connected');
+        if (params.jwt) {
+            const decoded = await jwt.verify(params.jwt, process.env.JWT_SECRET);
+            const res = await getUserOrParticipant(decoded, params.jwt);
+            console.log(res.user ? res.user.username : (res.participant ? res.participant.username : ''));
+        }
+    },
+    onDisconnect: async (params, socket, ctx) => {
+        console.log('** Disconnected');
+    }
 }, {
     server: graphQLServer,
     path: SUBSCRIPTIONS_PATH

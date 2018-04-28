@@ -99,10 +99,17 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 export const wsClient = new SubscriptionClient(`ws://${URL}/subscriptions`, {
     lazy: true,
     reconnect: true,
+    reconnectionAttempts: 10,
+    timeout: 3000,
     connectionParams() {
         return { jwt: store.getState().auth.jwt };
     }
 });
+
+wsClient.onConnected(() => console.log('** Connected'));
+wsClient.onReconnected(() => console.log('** Reconnected'));
+wsClient.onDisconnected(() => console.log('** Disconnected'));
+wsClient.onError(() => console.log('** Error'));
 
 const webSocketLink = new WebSocketLink(wsClient);
 

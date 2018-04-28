@@ -12,6 +12,9 @@ services:
         command: rethinkdb --bind all --directory /data 
         restart: always
 
+    redis:
+        image: redis
+
     api:
         image: api
         container_name: api
@@ -22,8 +25,10 @@ services:
                 NODE_ENV: development
         links:
             - rdb
+            - redis
         depends_on:
             - rdb
+            - redis
         ports:
             - 3000:3000
         volumes:
