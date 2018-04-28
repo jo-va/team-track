@@ -62,7 +62,7 @@ class Main extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (!this.groupDistanceSubscription && nextProps.participant) {
+        if (!this.groupDistanceSubscription && nextProps.participant && this.props.subscribeToMore) {
             this.groupDistanceSubscription = this.props.subscribeToMore({
                 document: GROUP_DISTANCE_UPDATED_SUBSCRIPTION,
                 variables: {
@@ -86,7 +86,7 @@ class Main extends React.Component {
                 }
             });
         }
-        if (!this.eventDistanceSubscription && nextProps.participant) {
+        if (!this.eventDistanceSubscription && nextProps.participant && this.props.subscribeToMore) {
             this.eventDistanceSubscription = this.props.subscribeToMore({
                 document: EVENT_DISTANCE_UPDATED_SUBSCRIPTION,
                 variables: {
@@ -161,10 +161,12 @@ class Main extends React.Component {
                                     flex: 1.5
                                 }, value: {
                                     fontSize: 70,
-                                    color: '#f0ad4e'
+                                    color: tracking.isTracking ? theme.secondaryColor : '#444'
+                                }, title: {
+                                    fontSize: 25
                                 }
                             }}
-                            value={this.formatDistance(participant.distance, 5)}
+                            value={this.formatDistance(participant.distance, 2)}
                             title={participant.username}
                             label='DISTANCE (km)'
                         />

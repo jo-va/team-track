@@ -47,11 +47,12 @@ export const startTracking = () => dispatch => {
 
             return dispatch({ type: TRACKING_ERROR, error: error.message });
         },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 0 },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 5 },
     );
 
     Toast.show({
         text: 'Tracking started',
+        type: 'success',
         position: 'top'
     });
 
@@ -65,6 +66,7 @@ export const stopTracking = () => {
 
     Toast.show({
         text: 'Tracking stopped',
+        type: 'success',
         position: 'top'
     });
 

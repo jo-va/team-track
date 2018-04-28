@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
         borderColor: 'transparent',
         height: 45,
         marginVertical: 7,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)'
+        backgroundColor: 'rgba(255, 255, 255, 0.15)'
     },
     inputStyle: {
         flex: 1,

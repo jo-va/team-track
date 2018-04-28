@@ -26,7 +26,7 @@ import auth from './reducers/auth.reducer';
 import tracking from './reducers/tracking.reducer';
 import { logout } from './actions/auth.actions';
 
-const URL = '192.168.0.183:3000';
+const URL = 'http://teamtrack.localtunnel.me:3000/graphql';
 
 const config = {
     key: 'root',
@@ -56,7 +56,7 @@ const cache = new ReduxCache({ store });
 const reduxLink = new ReduxLink(store);
 
 const httpLink = new HttpLink({
-    uri: `http://${URL}/graphql`
+    uri: URL
 });
 
 const authLink = setContext((req, previousContext) => {

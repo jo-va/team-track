@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, StyleSheet, TouchableHighlight, Text, Animated } from 'react-native';
-import { Icon } from 'native-base';
 import theme from '../theme';
 
 const styles = StyleSheet.create({
@@ -17,10 +16,10 @@ const styles = StyleSheet.create({
         alignSelf: 'stretch',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f0ad4e',
+        backgroundColor: theme.mainColor
     },
     buttonPressed: {
-        backgroundColor: '#2cccd6'
+        backgroundColor: theme.secondaryColor
     },
     icon: {
         fontSize: 40,
@@ -66,6 +65,7 @@ class PlayToggle extends React.Component {
 
     componentWillUnmount() {
         this.state.pressAction.removeAllListeners();
+        this.state.pressAction.stopAnimation();
     }
 
     handlePressIn() {
@@ -108,18 +108,14 @@ class PlayToggle extends React.Component {
         return (
             <View style={[styles.container, style && style.container]}>
                 <TouchableHighlight
-                    underlayColor={pressed ? 'rgba(44, 204, 214, 0.5)' : 'rgba(240, 173, 78, 0.5)'}
+                    underlayColor={(pressed ? theme.secondaryColor : theme.mainColor) + 'cc'}
                     onPressIn={this.handlePressIn}
                     onPressOut={this.handlePressOut}
                     style={[styles.button, pressed && styles.buttonPressed, style && style.button]}
                 >
                     <View style={styles.container} onLayout={this.getButtonWidthLayout}>
                         <Animated.View style={[styles.bgFill, this.getProgressStyles()]} />
-                        {
-                            pressed ?
-                            <Icon name='md-pause' style={[styles.icon, style && style.icon]} /> :
-                            <Text style={styles.text}>Hold to start</Text>
-                        }
+                        <Text style={styles.text}>{pressed ? 'Hold to stop' : 'Hold to start'}</Text>
                     </View>
                 </TouchableHighlight>
             </View>
