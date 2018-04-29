@@ -17,4 +17,7 @@ type Mutation {
     join(username: String!, secret: String!): Participant
     # Update the position of the logged in participant
     step(location: LocationInput!): Participant
+
+    startTracking: Participant
+    stopTracking: Participant
 }

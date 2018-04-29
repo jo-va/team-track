@@ -24,20 +24,20 @@ export const startTracking = () => dispatch => {
                         speed: position.coords.speed,
                         heading: position.coords.heading,
                         accuracy: position.coords.accuracy,
-                        timestamp: position.coords.timestamp
+                        timestamp: position.timestamp
                     }
                 },
-                update: (store, { data: { move } }) => {
+                update: (store, { data: { step } }) => {
                     const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
-                    data.currentParticipant.distance = move.distance;
-                    data.currentParticipant.state = move.state;
+                    data.currentParticipant.distance = step.distance;
+                    data.currentParticipant.state = step.state;
                     store.writeQuery({
                         query: CURRENT_PARTICIPANT_QUERY,
                         data
                     });
                 }
             }).catch(err => {
-                console.log('> Move mutation error');
+                console.log('> Step mutation error');
                 console.log(err);
             });
 

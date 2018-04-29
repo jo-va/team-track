@@ -82,6 +82,8 @@ const create = async (username, secret) => {
 const step = async (id, { latitude, longitude, speed, heading, accuracy, timestamp }) => {
     const r = getRethink();
 
+    console.log({ latitude, longitude, speed, heading, accuracy, timestamp })
+
     const participant = await r.table('participants').get(id).default(null);
     if (!participant) {
         throw new Error('You must join a group');
@@ -146,6 +148,22 @@ const step = async (id, { latitude, longitude, speed, heading, accuracy, timesta
     return result.changes[0].new_val;
 };
 
+const startTracking = async (id) => {
+    const result = await r.table('participants').get(id).update({
+        state: 'active'
+    });
+
+    return result.changes[0].new_val;
+};
+
+const stopTracking = async (id) => {
+    const result = await r.table('participants').get(id).update({
+        state: 'inactive'
+    });
+
+    return result.changes[0].new_val;
+};
+
 const onParticipantJoined = handler => {
     const r = getRethink();
 
@@ -171,5 +189,7 @@ export const Participant = {
     findAllByGroupId,
     create,
     step,
+    startTracking,
+    stopTracking,
     onParticipantJoined
 };
