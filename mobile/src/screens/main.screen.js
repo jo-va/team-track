@@ -157,6 +157,7 @@ class Main extends React.Component {
             <Container>
                 <Content contentContainerStyle={{flex: 1}}>
                     <View style={styles.container}>
+                        <Text>{participant.state}</Text>
                         <Meter
                             style={{
                                 container: {

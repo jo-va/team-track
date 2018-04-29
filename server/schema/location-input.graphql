@@ -4,5 +4,5 @@ input LocationInput {
     speed: Float,
     heading: Float,
     accuracy: Float,
-    timestamp: Int
+    timestamp: Float
 }

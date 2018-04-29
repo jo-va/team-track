@@ -149,17 +149,19 @@ const step = async (id, { latitude, longitude, speed, heading, accuracy, timesta
 };
 
 const startTracking = async (id) => {
+    const r = getRethink();
     const result = await r.table('participants').get(id).update({
         state: 'active'
-    });
+    }, { returnChanges: 'always' });
 
     return result.changes[0].new_val;
 };
 
 const stopTracking = async (id) => {
+    const r = getRethink();
     const result = await r.table('participants').get(id).update({
         state: 'inactive'
-    });
+    }, { returnChanges: 'always' });
 
     return result.changes[0].new_val;
 };
