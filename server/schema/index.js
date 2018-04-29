@@ -1,4 +1,4 @@
-import SchemaDefinition from './schemaDefinition.graphql';
+import SchemaDefinition from './schema-definition.graphql';
 
 import Query from './query.graphql';
 import Mutation from './mutation.graphql';
@@ -8,6 +8,7 @@ import User from './user.graphql';
 import Participant from './participant.graphql';
 import Group from './group.graphql';
 import Event from './event.graphql';
+import LocationInput from './location-input.graphql';
 
 export default [
     SchemaDefinition,
@@ -17,5 +18,6 @@ export default [
     User,
     Participant,
     Group,
-    Event
+    Event,
+    LocationInput
 ];

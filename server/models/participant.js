@@ -79,7 +79,7 @@ const create = async (username, secret) => {
 // Updates the participant's position and distance
 // If the position is valid, the group's distance will be updated as well,
 // Returns the updated participant and group
-const move = async (id, latitude, longitude) => {
+const step = async (id, { latitude, longitude, speed, heading, accuracy, timestamp }) => {
     const r = getRethink();
 
     const participant = await r.table('participants').get(id).default(null);
@@ -170,6 +170,6 @@ export const Participant = {
     findByIdAndVersion,
     findAllByGroupId,
     create,
-    move,
+    step,
     onParticipantJoined
 };

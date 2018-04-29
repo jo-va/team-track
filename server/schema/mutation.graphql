@@ -15,6 +15,6 @@ type Mutation {
 
     # Participate to the event, must be logged in, must provide the secret to be associated to a group
     join(username: String!, secret: String!): Participant
-    # Update the position of the logged in user
-    move(latitude: Float, longitude: Float): Participant
+    # Update the position of the logged in participant
+    step(location: LocationInput!): Participant
 }

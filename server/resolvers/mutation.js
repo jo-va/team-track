@@ -86,8 +86,8 @@ export const Mutation = {
         return participant;
     },
 
-    move: async (root, { latitude, longitude }, ctx) => {
+    step: async (root, { location }, ctx) => {
         mustBeAuthenticated(ctx, ctx.participant);
-        return Participant.move(ctx.participant.id, latitude, longitude);
+        return Participant.step(ctx.participant.id, location);
     }
 };

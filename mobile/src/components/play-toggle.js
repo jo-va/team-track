@@ -88,7 +88,7 @@ class PlayToggle extends React.Component {
     }
 
     getButtonWidthLayout(e) {
-        this.setState({ width: e.nativeEvent.layout.width });
+        this.setState({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height });
     }
 
     getProgressStyles() {
@@ -97,7 +97,11 @@ class PlayToggle extends React.Component {
             outputRange: [0, this.state.width]
         });
 
-        return { width };
+        return {
+            width,
+            //height: this.state.height,
+            //backgroundColor: this.props.pressed ? theme.mainColor : theme.secondaryColor
+        };
     }
 
     render() {

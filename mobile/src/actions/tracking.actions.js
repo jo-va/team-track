@@ -7,7 +7,7 @@ import {
     TRACKING_ERROR,
     POSITION
 } from './constants';
-import MOVE_MUTATION from '../graphql/move.mutation';
+import STEP_MUTATION from '../graphql/step.mutation';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 
 let watchId = null;
@@ -16,10 +16,16 @@ export const startTracking = () => dispatch => {
     watchId = navigator.geolocation.watchPosition(
         (position) => {
             client.mutate({
-                mutation: MOVE_MUTATION,
+                mutation: STEP_MUTATION,
                 variables: {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude
+                    location: {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        speed: position.coords.speed,
+                        heading: position.coords.heading,
+                        accuracy: position.coords.accuracy,
+                        timestamp: position.coords.timestamp
+                    }
                 },
                 update: (store, { data: { move } }) => {
                     const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
@@ -42,18 +48,18 @@ export const startTracking = () => dispatch => {
                 text: `Tracking error: ${error.message}`,
                 type: 'danger',
                 duration: 10000,
-                position: 'top'
+                position: 'bottom'
             });
 
             return dispatch({ type: TRACKING_ERROR, error: error.message });
         },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 5 },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: 0 },
     );
 
     Toast.show({
         text: 'Tracking started',
         type: 'success',
-        position: 'top'
+        position: 'bottom'
     });
 
     return dispatch({ type: START_TRACKING });
@@ -67,7 +73,7 @@ export const stopTracking = () => {
     Toast.show({
         text: 'Tracking stopped',
         type: 'success',
-        position: 'top'
+        position: 'bottom'
     });
 
     return { type: STOP_TRACKING };

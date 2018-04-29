@@ -1,0 +1,8 @@
+input LocationInput {
+    latitude: Float!,
+    longitude: Float!,
+    speed: Float,
+    heading: Float,
+    accuracy: Float,
+    timestamp: Int
+}
