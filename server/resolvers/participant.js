@@ -24,8 +24,12 @@ export const Participant = {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
         return participant.longitude;
     },
-    state: (participant, args, ctx) => {
+    isActive: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return participant.state;
-    }
+        return participant.isActive;
+    },
+    isOutOfRange: (participant, args, ctx) => {
+        mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
+        return participant.isOutOfRange;
+    }    
 };

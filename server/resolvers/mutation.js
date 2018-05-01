@@ -86,9 +86,9 @@ export const Mutation = {
         return participant;
     },
 
-    step: async (root, { location }, ctx) => {
+    addLocation: async (root, { location }, ctx) => {
         mustBeAuthenticated(ctx, ctx.participant);
-        return Participant.step(ctx.participant.id, location);
+        return Participant.addLocation(ctx.participant.id, location);
     },
 
     startTracking: async (root, args, ctx) => {

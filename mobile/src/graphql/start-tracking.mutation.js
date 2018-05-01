@@ -4,7 +4,7 @@ const START_TRACKING_MUTATION = gql`
     mutation startTracking {
         startTracking {
             distance
-            state
+            isActive
         }
     }
 `;

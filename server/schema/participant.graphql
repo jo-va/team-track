@@ -7,5 +7,6 @@ type Participant {
     distance: Float
     latitude: Float
     longitude: Float
-    state: String
+    isActive: Boolean
+    isOutOfRange: Boolean
 }

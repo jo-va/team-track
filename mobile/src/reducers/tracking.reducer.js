@@ -5,10 +5,10 @@ import {
     START_TRACKING,
     STOP_TRACKING,
     TRACKING_ERROR,
-    POSITION
+    LOCATION
 } from '../actions/constants';
 
-const defaultPosition = Immutable({
+const defaultLocation = Immutable({
     latitude: null,
     longitude: null,
     altitude: null,
@@ -20,7 +20,7 @@ const defaultPosition = Immutable({
 
 const INITIAL_STATE = Immutable({
     isTracking: false,
-    position: defaultPosition,
+    location: defaultLocation,
     error: null
 });
 
@@ -36,9 +36,9 @@ const tracking = (state = INITIAL_STATE, action) => {
             return Immutable.merge(state, { isTracking: false, error: null });
         case TRACKING_ERROR:
             return Immutable.merge(state, { error: action.error });
-        case POSITION:
-            const { position: { coords, timestamp } } = action;
-            const position = {
+        case LOCATION:
+            const { location: { coords, timestamp } } = action;
+            const location = {
                 latitude: coords.latitude,
                 longitude: coords.longitude,
                 altitude: coords.altitude,
@@ -47,7 +47,7 @@ const tracking = (state = INITIAL_STATE, action) => {
                 accuracy: coords.accuracy,
                 timestamp: timestamp
             };
-            return Immutable.merge(state, { position, error: null });
+            return Immutable.merge(state, { location, error: null });
         default:
             return state;
     }

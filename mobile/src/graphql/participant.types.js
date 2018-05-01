@@ -4,7 +4,8 @@ export const ParticipantPropTypes = PropTypes.shape({
     id: PropTypes.string.isRequired,
     username: PropTypes.string.isRequired,
     distance: PropTypes.number.isRequired,
-    state: PropTypes.string.isRequired,
+    isActive: PropTypes.bool.isRequired,
+    isOutOfRange: PropTypes.bool.isRequired,
     group: PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,

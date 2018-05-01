@@ -157,7 +157,7 @@ class Main extends React.Component {
             <Container>
                 <Content contentContainerStyle={{flex: 1}}>
                     <View style={styles.container}>
-                        <Text>{participant.state}</Text>
+                        <Text>{participant.isActive ? 'active' : 'inactive'}</Text>
                         <Meter
                             style={{
                                 container: {
@@ -222,12 +222,12 @@ class Main extends React.Component {
                         >
                             <View style={styles.modalContent}>
                                 <Text>isTracking: {tracking.isTracking ? 'true' : 'false'}</Text>
-                                <Text>timestamp: {tracking.position.timestamp}</Text>
-                                <Text>Latitude: {tracking.position.latitude}</Text>
-                                <Text>Longitude: {tracking.position.longitude}</Text>
-                                <Text>Accuracy: {tracking.position.accuracy}</Text>
-                                <Text>Speed: {tracking.position.speed}</Text>
-                                <Text>Heading: {tracking.position.heading}</Text>
+                                <Text>timestamp: {tracking.location.timestamp}</Text>
+                                <Text>Latitude: {tracking.location.latitude}</Text>
+                                <Text>Longitude: {tracking.location.longitude}</Text>
+                                <Text>Accuracy: {tracking.location.accuracy}</Text>
+                                <Text>Speed: {tracking.location.speed}</Text>
+                                <Text>Heading: {tracking.location.heading}</Text>
                                 {tracking.error ? <Text>Error: {tracking.error}</Text> : null}
                                     
                                 <Button onPress={this.logout} style={{marginTop: 10}} full>
@@ -265,7 +265,7 @@ Main.propTypes = {
 
 const currentParticipantQuery = graphql(CURRENT_PARTICIPANT_QUERY, {
     skip: ownProps => !ownProps.auth || !ownProps.auth.jwt,
-    options: ownProps => ({ fetchPolicy: 'network-only' }),
+    options: ownProps => ({ fetchPolicy: 'cache-first' }),
     props: ({ data: { loading, currentParticipant, refetch, subscribeToMore } }) => ({
         loading,
         participant: currentParticipant,

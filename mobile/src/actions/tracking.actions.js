@@ -5,16 +5,42 @@ import {
     START_TRACKING,
     STOP_TRACKING,
     TRACKING_ERROR,
-    POSITION
+    LOCATION
 } from './constants';
-import STEP_MUTATION from '../graphql/step.mutation';
+import ADD_LOCATION_MUTATION from '../graphql/add-location.mutation';
 import START_TRACKING_MUTATION from '../graphql/start-tracking.mutation';
 import STOP_TRACKING_MUTATION from '../graphql/stop-tracking.mutation';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 
-const DISTANCE_FILTER = 5;
+const DISTANCE_FILTER = 0;
+const MAX_AGE = 2000;
+const TIMEOUT = 5000;
 
 let watchId = null;
+
+// See this for a kalman filter:
+// https://medium.com/@mizutori/make-it-even-better-than-nike-how-to-filter-locations-tracking-highly-accurate-location-in-1c9d53d31d93
+
+function filterLocation(location) {
+    if (!location || !location.coords) {
+        return null;
+    }
+
+    if (location.coords.accuracy < 0) {
+        return null;
+    }
+
+    if (location.coords.accuracy > 100) {
+        return null;
+    }
+
+    const interval = Math.abs(Date.now() - location.timestamp);
+    if (interval > MAX_AGE) {
+        return null;
+    }
+
+    return location;
+}
 
 export const startTracking = () => dispatch => {
     client.mutate({
@@ -22,7 +48,7 @@ export const startTracking = () => dispatch => {
         update: (store, { data: { startTracking } }) => {
             const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
             data.currentParticipant.distance = startTracking.distance;
-            data.currentParticipant.state = startTracking.state;
+            data.currentParticipant.isActive = startTracking.isActive;
             store.writeQuery({
                 query: CURRENT_PARTICIPANT_QUERY,
                 data
@@ -34,34 +60,35 @@ export const startTracking = () => dispatch => {
     });
 
     watchId = navigator.geolocation.watchPosition(
-        (position) => {
-            client.mutate({
-                mutation: STEP_MUTATION,
-                variables: {
-                    location: {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                        speed: position.coords.speed,
-                        heading: position.coords.heading,
-                        accuracy: position.coords.accuracy,
-                        timestamp: position.timestamp
-                    }
-                },
-                update: (store, { data: { step } }) => {
-                    const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
-                    data.currentParticipant.distance = step.distance;
-                    data.currentParticipant.state = step.state;
-                    store.writeQuery({
-                        query: CURRENT_PARTICIPANT_QUERY,
-                        data
-                    });
-                }
-            }).catch(err => {
-                console.log('> Step mutation error');
-                console.log(err);
-            });
+        (location) => {
+            const filteredLocation = filterLocation(location);
 
-            return dispatch({ type: POSITION, position });
+            if (filteredLocation) {
+                const { coords: { latitude, longitude, speed, heading, accuracy }, timestamp } = filteredLocation;
+
+                client.mutate({
+                    mutation: ADD_LOCATION_MUTATION,
+                    variables: {
+                        location: {
+                            latitude, longitude, speed, heading, accuracy, timestamp
+                        }
+                    },
+                    update: (store, { data: { addLocation } }) => {
+                        const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
+                        data.currentParticipant.distance = addLocation.distance;
+                        data.currentParticipant.isOutOfRange = addLocation.isOutOfRange;
+                        store.writeQuery({
+                            query: CURRENT_PARTICIPANT_QUERY,
+                            data
+                        });
+                    }
+                }).catch(err => {
+                    console.log('> addLocation mutation error');
+                    console.log(err);
+                });
+
+                return dispatch({ type: LOCATION, location });
+            }
         },
         (error) => {
             Toast.show({
@@ -73,7 +100,7 @@ export const startTracking = () => dispatch => {
 
             return dispatch({ type: TRACKING_ERROR, error: error.message });
         },
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 1000, distanceFilter: DISTANCE_FILTER },
+        { enableHighAccuracy: true, timeout: TIMEOUT, maximumAge: MAX_AGE, distanceFilter: DISTANCE_FILTER },
     );
 
     Toast.show({
@@ -85,21 +112,27 @@ export const startTracking = () => dispatch => {
     return dispatch({ type: START_TRACKING });
 };
 
-export const stopTracking = () => {
+export const stopGeolocation = () => {
     navigator.geolocation.clearWatch(watchId);
     navigator.geolocation.stopObserving();
     watchId = null;
+
+    return { type: STOP_TRACKING };
+};
+
+export const stopTracking = () => {
+    stopGeolocation();
 
     client.mutate({
         mutation: STOP_TRACKING_MUTATION,
         update: (store, { data: { stopTracking } }) => {
             const data = store.readQuery({ query: CURRENT_PARTICIPANT_QUERY });
             data.currentParticipant.distance = stopTracking.distance;
-            data.currentParticipant.state = stopTracking.state;
+            data.currentParticipant.isActive = stopTracking.isActive;
             store.writeQuery({
                 query: CURRENT_PARTICIPANT_QUERY,
                 data
-            });            
+            });
         }
     }).catch(err => {
         console.log('> stopTracking mutation error');

@@ -17,7 +17,7 @@ class Map extends React.Component {
 
         this.state = {
             loading: true,
-            position: {
+            location: {
                 latitude: null,
                 longitude: null,
             },
@@ -34,12 +34,12 @@ class Map extends React.Component {
     }
 
     componentDidMount() {
-        this.updatePosition(this.props.tracking.position);
+        this.updateLocation(this.props.tracking.location);
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.tracking.position !== nextProps.tracking.position) {
-            this.updatePosition(nextProps.tracking.position);
+        if (this.props.tracking.location !== nextProps.tracking.location) {
+            this.updateLocation(nextProps.tracking.location);
         }
     }
 
@@ -47,7 +47,7 @@ class Map extends React.Component {
         this.setState({ region });
     }
 
-    updatePosition({ latitude, longitude, accuracy }) {
+    updateLocation({ latitude, longitude, accuracy }) {
         if (!latitude || !longitude) {
             return;
         }
@@ -58,7 +58,7 @@ class Map extends React.Component {
 
         this.setState({
             loading: false,
-            position: { latitude, longitude },
+            location: { latitude, longitude },
             accuracy
         });
     }
@@ -86,7 +86,7 @@ class Map extends React.Component {
                         style={styles.map}
                     >
                         <Circle
-                            center={this.state.position}
+                            center={this.state.location}
                             radius={this.state.accuracy}
                             fillColor='rgba(255,0,0,0.5)'
                             strokeColor='red'

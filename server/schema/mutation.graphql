@@ -16,8 +16,9 @@ type Mutation {
     # Participate to the event, must be logged in, must provide the secret to be associated to a group
     join(username: String!, secret: String!): Participant
     # Update the position of the logged in participant
-    step(location: LocationInput!): Participant
-
+    addLocation(location: LocationInput!): Participant
+    # Start the tracking for a logged in participant
     startTracking: Participant
+    # Stop the tracking for a logged in participant
     stopTracking: Participant
 }

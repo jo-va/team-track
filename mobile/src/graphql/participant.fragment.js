@@ -5,7 +5,8 @@ const PARTICIPANT_FRAGMENT = gql`
         id        
         username
         distance
-        state
+        isActive
+        isOutOfRange
         group {
             id
             name
@@ -16,7 +17,7 @@ const PARTICIPANT_FRAGMENT = gql`
             name
             distance
             state
-        }        
+        }
     }
 `;
 

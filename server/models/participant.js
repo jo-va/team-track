@@ -50,7 +50,8 @@ const create = async (username, secret) => {
         distance: 0,
         latitude: null,
         longitude: null,
-        state: 'inactive',
+        isActive: false,
+        isOutOfRange: false,
         version: 1
     };
 
@@ -79,7 +80,7 @@ const create = async (username, secret) => {
 // Updates the participant's position and distance
 // If the position is valid, the group's distance will be updated as well,
 // Returns the updated participant and group
-const step = async (id, { latitude, longitude, speed, heading, accuracy, timestamp }) => {
+const addLocation = async (id, { latitude, longitude, speed, heading, accuracy, timestamp }) => {
     const r = getRethink();
 
     console.log({ latitude, longitude, speed, heading, accuracy, timestamp })
@@ -88,6 +89,11 @@ const step = async (id, { latitude, longitude, speed, heading, accuracy, timesta
     if (!participant) {
         throw new Error('You must join a group');
     }
+
+    if (!participant.isActive) {
+        return participant;
+    }
+
     const event = await r.table('events').get(participant.event).default(null);
     if (!event) {
         throw new Error('No event found');
@@ -97,18 +103,24 @@ const step = async (id, { latitude, longitude, speed, heading, accuracy, timesta
     if (event.radius && event.radius > 0) {
         const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
         if (dist2center > event.radius) {
-            const result = await r.table('participants').get(id).update({
-                state: 'inactive'
-            }, { returnChanges: 'always' });
-            return result.changes[0].new_val;
+            if (!participant.isOutOfRange) {
+                const result = await r.table('participants').get(id).update({
+                    isOutOfRange: true
+                }, { returnChanges: 'always' });
+                return result.changes[0].new_val;
+            } else {
+                return participant;
+            }
         }
     }
 
     // If we just entered the perimeter, don't update the distance since the last point was outside,
-    // update the state only
-    if (participant.state === 'inactive') {
+    // update the state and location only
+    if (participant.isOutOfRange) {
         const result = await r.table('participants').get(id).update({
-            state: 'active'
+            isOutOfRange: false,
+            longitude,
+            latitude,
         }, { returnChanges: 'always' });
         return result.changes[0].new_val;
     }
@@ -139,7 +151,6 @@ const step = async (id, { latitude, longitude, speed, heading, accuracy, timesta
     }
 
     const result = await r.table('participants').get(id).update({
-        state: 'active',
         longitude,
         latitude,
         distance: r.row('distance').default(0).add(increment)
@@ -151,7 +162,7 @@ const step = async (id, { latitude, longitude, speed, heading, accuracy, timesta
 const startTracking = async (id) => {
     const r = getRethink();
     const result = await r.table('participants').get(id).update({
-        state: 'active'
+        isActive: true
     }, { returnChanges: 'always' });
 
     return result.changes[0].new_val;
@@ -160,7 +171,7 @@ const startTracking = async (id) => {
 const stopTracking = async (id) => {
     const r = getRethink();
     const result = await r.table('participants').get(id).update({
-        state: 'inactive'
+        isActive: false
     }, { returnChanges: 'always' });
 
     return result.changes[0].new_val;
@@ -190,7 +201,7 @@ export const Participant = {
     findByIdAndVersion,
     findAllByGroupId,
     create,
-    step,
+    addLocation,
     startTracking,
     stopTracking,
     onParticipantJoined
