@@ -13,6 +13,7 @@ import { ReduxCache, apolloReducer } from 'apollo-cache-redux';
 import ReduxLink from 'apollo-link-redux';
 import { onError } from 'apollo-link-error';
 import { WebSocketLink } from 'apollo-link-ws';
+import { RetryLink } from 'apollo-link-retry';
 import { getMainDefinition } from 'apollo-utilities';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { PersistGate } from 'redux-persist/lib/integration/react';
@@ -94,6 +95,24 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     }
 });
 
+const retryLink = new RetryLink({
+    delay: {
+        initial: 300,
+        max: Infinity,
+        jitter: true
+    },
+    attempts: {
+        max: 5,
+        retryIf: (error, _operation) => !!error
+    }
+});
+
+const logLink = (operation, forward) => {
+    const { operationName } = operation;
+    console.log('[GraphQL] ', operationName);
+    return forward(operation);
+}
+
 export const wsClient = new SubscriptionClient(`ws://${URL}/subscriptions`, {
     lazy: true,
     reconnect: true,
@@ -125,6 +144,8 @@ const requestLink = ({ queryOrMutationLink, subscriptionLink }) => {
 const link = ApolloLink.from([
     reduxLink,
     errorLink,
+    retryLink,
+    logLink,
     requestLink({
         queryOrMutationLink: authLink.concat(httpLink),
         subscriptionLink: webSocketLink

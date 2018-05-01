@@ -436,7 +436,7 @@
   version "0.12.6"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-0.12.6.tgz#3d619198585fcabe5f4e1adfb5cf5f3388c66c13"
 
-"@types/zen-observable@^0.5.3":
+"@types/zen-observable@0.5.3", "@types/zen-observable@^0.5.3":
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.5.3.tgz#91b728599544efbb7386d8b6633693a3c2e7ade5"
 
@@ -634,6 +634,13 @@ apollo-link-redux@^0.2.1:
   dependencies:
     "@babel/runtime" "^7.0.0-beta.32"
     apollo-utilities "^1.0.0"
+
+apollo-link-retry@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/apollo-link-retry/-/apollo-link-retry-2.2.3.tgz#5bdfabb719edae8faf7340c36ae6b9c13e1ddabb"
+  dependencies:
+    "@types/zen-observable" "0.5.3"
+    apollo-link "^1.2.2"
 
 apollo-link-ws@^1.0.8:
   version "1.0.8"
