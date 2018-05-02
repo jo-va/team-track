@@ -106,6 +106,7 @@ export const startTracking = () => dispatch => {
     Toast.show({
         text: 'Tracking started',
         type: 'success',
+        duration: 2000,
         position: 'bottom'
     });
 
@@ -142,6 +143,7 @@ export const stopTracking = () => {
     Toast.show({
         text: 'Tracking stopped',
         type: 'success',
+        duration: 2000,
         position: 'bottom'
     });
 
