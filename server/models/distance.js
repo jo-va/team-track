@@ -1,10 +1,19 @@
 const EARTH_RADIUS_KM = 6371.0;
 const DEG2RAD = Math.PI / 180.0;
 
-// Haversine distance
-const calculateDistance = (lat1, lon1, lat2, lon2) => {
+// Haversine distance in Km
+const calculateDistance = (location1, location2) => {
+    if (!location1 || !location2) {
+        return -1;
+    }
+
+    const lat1 = location1.latitude;
+    const lon1 = location1.longitude;
+    const lat2 = location2.latitude;
+    const lon2 = location2.longitude;
+
     if (lat1 === null || lon1 === null || lat2 === null || lon2 === null) {
-        return 0;
+        return -1;
     }
 
     const dLat = (lat2 - lat1) * DEG2RAD;
@@ -19,7 +28,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const c = 2.0 * Math.atan2(Math.sqrt(a), Math.sqrt(1.0 - a));
 
     const dist = Math.abs(EARTH_RADIUS_KM * c);
-    return Number.isFinite(dist) ? dist : 0;
+    return Number.isFinite(dist) ? dist : -1;
 };
 
 export { calculateDistance };

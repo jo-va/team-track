@@ -18,11 +18,17 @@ const findAllById = async (ids) => {
     return r.table('events').getAll(r.args(ids));
 }
 
-const create = async ({ name, latitude, longitude, radius}) => {
+const create = async ({ name, latitude = null, longitude = null, radius = null }) => {
+    const r = getRethink();
+
+    let location = null;
+    if (longitude !== null && latitude !== null) {
+        location = r.point(longitude, latitude);
+    }
+
     const event = {
         name: name.trim(),
-        latitude: latitude || null,
-        longitude: longitude || null,
+        location,
         radius: radius || 0,
         distance: 0,
         state: 'inactive'
@@ -31,8 +37,6 @@ const create = async ({ name, latitude, longitude, radius}) => {
     if (!event.name) {
         throw new Error('Event name cannot be blank');
     }
-
-    const r = getRethink();
 
     const eventFound = await r.table('events')
         .filter(r.row('name').downcase().eq(name.toLowerCase()))

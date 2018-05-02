@@ -18,11 +18,11 @@ export const Participant = {
     },
     latitude: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return participant.latitude;
+        return participant.location.coordinates[1];
     },
     longitude: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);
-        return participant.longitude;
+        return participant.location.coordinates[0];
     },
     isActive: (participant, args, ctx) => {
         mustBeOwnerOrAdmin(ctx, ctx.participant, participant);

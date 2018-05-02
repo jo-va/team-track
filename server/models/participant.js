@@ -48,8 +48,7 @@ const create = async (username, secret) => {
         group: group.id,
         event: group.event,
         distance: 0,
-        latitude: null,
-        longitude: null,
+        location: null,
         isActive: false,
         isOutOfRange: false,
         version: 1
@@ -77,10 +76,40 @@ const create = async (username, secret) => {
     return result.changes[0].new_val;
 };
 
+// See this for a kalman filter:
+// https://medium.com/@mizutori/make-it-even-better-than-nike-how-to-filter-locations-tracking-highly-accurate-location-in-1c9d53d31d93
+const MAX_AGE = 2000;
+const MIN_DISTANCE = 0.01;
+const MAX_GROUP_DISTANCE_ACCUM = 1;
+
+function filterLocation(location) {
+    if (!location ||
+        location.latitude === null ||
+        location.longitude === null ||
+        location.accuracy === null) {
+        return null;
+    }
+
+    if (location.accuracy < 0) {
+        return null;
+    }
+
+    if (location.accuracy > 100) {
+        return null;
+    }
+
+    const interval = Math.abs(Date.now() - location.timestamp);
+    if (interval > MAX_AGE) {
+        return null;
+    }
+
+    return location;
+}
+
 // Updates the participant's position and distance
 // If the position is valid, the group's distance will be updated as well,
 // Returns the updated participant and group
-const addLocation = async (id, { latitude, longitude, speed, heading, accuracy, timestamp }) => {
+const addLocation = async (id, { latitude, longitude, speed = null, heading = null, accuracy, timestamp }) => {
     const r = getRethink();
 
     console.log({ latitude, longitude, speed, heading, accuracy, timestamp })
@@ -90,6 +119,7 @@ const addLocation = async (id, { latitude, longitude, speed, heading, accuracy, 
         throw new Error('You must join a group');
     }
 
+    // Ignore if inactive
     if (!participant.isActive) {
         return participant;
     }
@@ -99,9 +129,15 @@ const addLocation = async (id, { latitude, longitude, speed, heading, accuracy, 
         throw new Error('No event found');
     }
 
+    // Filter the location before we use it
+    const location = filterLocation({ latitude, longitude, speed, accuracy, timestamp });
+    if (!location) {
+        return participant;
+    }
+
     // make sure the participant is within the allowed event perimeter
     if (event.radius && event.radius > 0) {
-        const dist2center = calculateDistance(event.latitude, event.longitude, latitude, longitude);
+        const dist2center = calculateDistance(event.location, location);
         if (dist2center > event.radius) {
             if (!participant.isOutOfRange) {
                 const result = await r.table('participants').get(id).update({
@@ -119,44 +155,41 @@ const addLocation = async (id, { latitude, longitude, speed, heading, accuracy, 
     if (participant.isOutOfRange) {
         const result = await r.table('participants').get(id).update({
             isOutOfRange: false,
-            longitude,
-            latitude,
+            location: r.point(longitude, latitude),
         }, { returnChanges: 'always' });
         return result.changes[0].new_val;
     }
 
     // Calculate displacement
-    const increment = calculateDistance(participant.latitude, participant.longitude, latitude, longitude);
-    const threshold = 1;
-
-    if (increment > 0) {
-        const result = await r.table('groups').get(participant.group).update({
+    const increment = calculateDistance(participant.location, location);
+    if (increment > MIN_DISTANCE) {
+        let result = await r.table('groups').get(participant.group).update({
             distance: r.row('distance').default(0).add(increment),
-            distanceIncrement: r.branch(
-                r.row('distanceIncrement').default(0).add(increment).gt(threshold),
+            distanceAccum: r.branch(
+                r.row('distanceAccum').default(0).add(increment).gt(MAX_GROUP_DISTANCE_ACCUM),
                 0,
-                r.row('distanceIncrement').default(0).add(increment)
+                r.row('distanceAccum').default(0).add(increment)
             )
         }, {
             returnChanges: 'always'
         });
 
         const changes = result.changes[0];
-        if (changes.new_val.distanceIncrement === 0) {
-            console.log(`> Adding ${changes.old_val.distanceIncrement + increment} km to the event`);
+        if (changes.new_val.distanceAccum === 0) {
+            console.log(`> Adding ${changes.old_val.distanceAccum + increment} km to the event`);
             await r.table('events').get(participant.event).update({
-                distance: r.row('distance').default(0).add(changes.old_val.distanceIncrement + increment)
+                distance: r.row('distance').default(0).add(changes.old_val.distanceAccum + increment)
             });
         }
+
+        result = await r.table('participants').get(id).update({
+            location: r.point(longitude, latitude),
+            distance: r.row('distance').default(0).add(increment)
+        }, { returnChanges: 'always' });
+
+        return result.changes[0].new_val;
     }
-
-    const result = await r.table('participants').get(id).update({
-        longitude,
-        latitude,
-        distance: r.row('distance').default(0).add(increment)
-    }, { returnChanges: 'always' });
-
-    return result.changes[0].new_val;
+    return participant;
 };
 
 const startTracking = async (id) => {
