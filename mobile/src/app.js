@@ -27,7 +27,8 @@ import auth from './reducers/auth.reducer';
 import tracking from './reducers/tracking.reducer';
 import { logout } from './actions/auth.actions';
 
-const URL = '35.227.111.141:3000';
+const URL = '35.203.100.14:3000';
+//const URL = '192.168.0.183:3000';
 
 const config = {
     key: 'root',

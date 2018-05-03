@@ -12,7 +12,10 @@ const calculateDistance = (location1, location2) => {
     const lat2 = location2.latitude;
     const lon2 = location2.longitude;
 
-    if (lat1 === null || lon1 === null || lat2 === null || lon2 === null) {
+    if (lat1 === null || lat1 === undefined ||
+        lon1 === null || lon1 === undefined ||
+        lat2 === null || lat2 === undefined ||
+        lon2 === null || lon2 === undefined) {
         return -1;
     }
 

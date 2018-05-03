@@ -112,7 +112,7 @@ function filterLocation(location) {
 const addLocation = async (id, { latitude, longitude, speed = null, heading = null, accuracy, timestamp }) => {
     const r = getRethink();
 
-    console.log({ latitude, longitude, speed, heading, accuracy, timestamp })
+    //console.log({ latitude, longitude, speed, heading, accuracy, timestamp })
 
     const participant = await r.table('participants').get(id).default(null);
     if (!participant) {
@@ -137,7 +137,11 @@ const addLocation = async (id, { latitude, longitude, speed = null, heading = nu
 
     // make sure the participant is within the allowed event perimeter
     if (event.radius && event.radius > 0) {
-        const dist2center = calculateDistance(event.location, location);
+        const eventLocation = {
+            longitude: event.location.coordinates[0],
+            latitude: event.location.coordinates[1]
+        };
+        const dist2center = calculateDistance(eventLocation, location);
         if (dist2center > event.radius) {
             if (!participant.isOutOfRange) {
                 const result = await r.table('participants').get(id).update({
@@ -155,13 +159,26 @@ const addLocation = async (id, { latitude, longitude, speed = null, heading = nu
     if (participant.isOutOfRange) {
         const result = await r.table('participants').get(id).update({
             isOutOfRange: false,
-            location: r.point(longitude, latitude),
+            location: r.point(location.longitude, location.latitude)
         }, { returnChanges: 'always' });
         return result.changes[0].new_val;
     }
 
+    if (!participant.location) {
+        const result = await r.table('participants').get(id).update({
+            location: r.point(location.longitude, location.latitude)
+        }, { returnChanges: 'always' });
+
+        return result.changes[0].new_val;
+    }
+
     // Calculate displacement
-    const increment = calculateDistance(participant.location, location);
+    const participantLocation = {
+        longitude: participant.location.coordinates[0],
+        latitude: participant.location.coordinates[1]
+    };
+    const increment = calculateDistance(participantLocation, location);
+    console.log('> Increment = ' + increment);
     if (increment > MIN_DISTANCE) {
         let result = await r.table('groups').get(participant.group).update({
             distance: r.row('distance').default(0).add(increment),
@@ -183,7 +200,7 @@ const addLocation = async (id, { latitude, longitude, speed = null, heading = nu
         }
 
         result = await r.table('participants').get(id).update({
-            location: r.point(longitude, latitude),
+            location: r.point(location.longitude, location.latitude),
             distance: r.row('distance').default(0).add(increment)
         }, { returnChanges: 'always' });
 
