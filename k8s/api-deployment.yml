@@ -15,8 +15,3 @@ spec:
           ports:
             - containerPort: 3000
               name: graphql
-          env:
-            - name: PORT
-              value: "3000"
-            - name: RETHINKDB_HOST
-              value: rdb

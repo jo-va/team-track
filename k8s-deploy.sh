@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#docker login
-docker build -t teamtrack .
-#docker tag teamtrack jova/teamtrack
-#docker push jova/teamtrack
-docker tag teamtrack gcr.io/teamtrack-api/api:v1
-
 gcloud docker -- push gcr.io/teamtrack-api/api:v1
 
 #gcloud components install kubectl
@@ -21,4 +15,6 @@ kubectl apply \
     -f k8s/db-deployment.yml \
     -f k8s/db-service.yml \
     -f k8s/db-admin-service.yml \
+    -f k8s/redis-deployment.yml \
+    -f k8s/redis-service.yml \
     --record

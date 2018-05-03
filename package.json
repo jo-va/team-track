@@ -9,7 +9,7 @@
         "start": "node build/server.js",
         "deploy:dev": "docker-compose up",
         "deploy:dev:build": "docker-compose up --build",
-        "deploy:prod": "yarn build && ./deploy.sh"
+        "deploy:prod": "yarn build && ./docker-build.sh && ./k8s-deploy.sh"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
