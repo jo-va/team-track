@@ -5,9 +5,20 @@ gcloud docker -- push gcr.io/teamtrack-api/api:v1
 #gcloud components install kubectl
 #gcloud init
 
-#gcloud config set project teamtrack-api
-#gcloud container clusters create teamtrack-cluster --zone us-east1-b --machine-type f1-micro --num-nodes 3 --network default
-gcloud container clusters get-credentials teamtrack-cluster --zone us-east1-b
+gcloud components update
+
+gcloud config set project teamtrack-api
+
+gcloud container clusters create teamtrack-cluster \
+    --zone northamerica-northeast1-a \
+    --machine-type n1-standard-2 \
+    --num-nodes 3 \
+    --enable-autoscaling \
+    --min-nodes 1 \
+    --max-nodes 3 \
+    --network default
+
+gcloud container clusters get-credentials teamtrack-cluster --zone northamerica-northeast1-a
 
 kubectl apply \
     -f k8s/api-deployment.yml \
