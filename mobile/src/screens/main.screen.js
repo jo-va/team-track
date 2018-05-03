@@ -157,7 +157,6 @@ class Main extends React.Component {
             <Container>
                 <Content contentContainerStyle={{flex: 1}}>
                     <View style={styles.container}>
-                        <Text>{participant.isActive ? 'active' : 'inactive'}</Text>
                         <Meter
                             style={{
                                 container: {

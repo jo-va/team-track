@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    db: rethinkdb
+  name: rethinkdb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        db: rethinkdb
+    spec:
+      containers:
+      - image: rethinkdb
+        args:
+          - "rethinkdb"
+          - "--bind"
+          - "all"
+        name: rethinkdb
+        ports:
+          - containerPort: 8080
+            name: admin
+          - containerPort: 28015
+            name: driver
+        volumeMounts:
+            - mountPath: /data/rethinkdb_data
+              name: rethinkdb-storage
+      volumes:
+        - name: rethinkdb-storage
+          emptyDir: {}

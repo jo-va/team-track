@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: teamtrack.api
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api-container
+          image: gcr.io/teamtrack-api/api:v1
+          ports:
+            - containerPort: 3000
+              name: graphql
+          env:
+            - name: PORT
+              value: "3000"
+            - name: RETHINKDB_HOST
+              value: rdb
