@@ -12,7 +12,7 @@ import START_TRACKING_MUTATION from '../graphql/start-tracking.mutation';
 import STOP_TRACKING_MUTATION from '../graphql/stop-tracking.mutation';
 import CURRENT_PARTICIPANT_QUERY from '../graphql/current-participant.query';
 
-const DISTANCE_FILTER = 0;
+const DISTANCE_FILTER = 5;
 const MAX_AGE = 2000;
 const TIMEOUT = 5000;
 
