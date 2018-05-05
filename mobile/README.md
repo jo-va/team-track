@@ -1,21 +1,79 @@
-- yarn
-- react-native upgrade
-- Android: Set android:windowSoftInputMode="adjustPan" in AndroidManifest.xml.
-- react-native link
-- react-native run-android
+## Setup
 
-Resources:
+```bash
+$ yarn
+$ react-native upgrade
+$ react-native link
+```
 
-Redux:
-https://medium.com/netscape/how-to-integrate-graphql-with-redux-in-react-native-c1912bf33120
-http://jasonwatmore.com/post/2017/09/16/react-redux-user-registration-and-login-tutorial-example
+### IOS
 
-Auth:
-https://medium.com/handlebar-labs/graphql-authentication-with-react-native-apollo-part-2-2-13ac8c362113
-https://code.tutsplus.com/tutorials/common-react-native-app-layouts-login-page--cms-27639
+Set the following keys in Info.plist:
+```xml
+<key>NSLocationAlwaysUsageDescription</key>
+<string>TeamTrack needs to access your location for tracking</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Your location is required by TeamTrack</string>
+```
+Add location as a background mode in the 'Capabilities' tab in XCode
 
-https://medium.com/react-native-training/building-chatty-part-7-authentication-in-graphql-cd37770e5ab3
 
-https://facebook.github.io/react-native/docs/geolocation.html
+### Android
 
-https://github.com/react-community/react-native-maps/blob/master/docs/installation.md
+Add this to AndroidManifes.xml:
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<application
+    <activity
+        android:name=".MainActivity"
+        ...
+        android:windowSoftInputMode="adjustPan">
+    </activity>
+</application>
+```
+
+Generate a signed key
+```bash
+keytool -genkey -v -keystore my-release-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Put the following in android/gradle.properties:
+```
+MYAPP_RELEASE_STORE_FILE=my-release-key.keystore
+MYAPP_RELEASE_KEY_ALIAS=my-key-alias
+MYAPP_RELEASE_STORE_PASSWORD=*****
+MYAPP_RELEASE_KEY_PASSWORD=*****
+```
+
+In android/app/build.gradle:
+```groovy
+...
+android {
+    ...
+    defaultConfig { ... }
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
+    }
+    buildTypes {
+        release {
+            ...
+            signingConfig signingConfigs.release
+        }
+    }
+}
+...
+```
+
+Build/run with these commands:
+```bash
+$ react-native run-android
+$ react-native run-android --variant=release
+$ cd android && ./gradlew assembleRelease
+```

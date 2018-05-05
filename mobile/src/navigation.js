@@ -15,46 +15,13 @@ import { connect } from 'react-redux';
 import { REHYDRATE } from 'redux-persist';
 
 import Main from './screens/main.screen';
-import Map from './screens/map.screen';
 import Join from './screens/join.screen';
 
 import { LOGOUT } from './actions/constants';
 
-// tabs in main screen
-const MainScreenNavigation = TabNavigator({
-    Main: { screen: Main },
-    Map: { screen: Map }
-}, {
-    initialRouteName: 'Main',
-    tabBarPosition: 'bottom',
-    tabBarComponent: props => {
-        return null;
-        /*return (
-            <Footer>
-                <FooterTab>
-                    <Button
-                        vertical
-                        active={props.navigationState.index === 0}
-                        onPress={() => props.navigation.navigate('Main')}>
-                        <Icon name='md-home' />
-                        <Text>Distance</Text>
-                    </Button>
-                    <Button
-                        vertical
-                        active={props.navigationState.index === 1}
-                        onPress={() => props.navigation.navigate('Map')}>
-                        <Icon name='md-map' />
-                        <Text>Map</Text>
-                    </Button>
-                </FooterTab>
-            </Footer>                                 
-        );*/
-    }
-});
-
 const AppNavigator = StackNavigator({
     Main: {
-        screen: MainScreenNavigation,
+        screen: Main,
         navigationOptions: {
             header: null
         }
